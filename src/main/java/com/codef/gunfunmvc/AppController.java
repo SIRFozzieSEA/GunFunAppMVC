@@ -105,7 +105,9 @@ public class AppController {
 		try {
 
 			Connection conn = jdbcTemplateOne.getDataSource().getConnection();
-			UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
+			if (getBuildSampleAssets()) {
+				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
+			}
 			processCleaningReport(conn);
 			conn.close();
 
@@ -1182,44 +1184,44 @@ public class AppController {
 
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " IMAGES.zip";
-			
+
 			File oDirectory = new File(backupFolderLocation);
 			if (oDirectory.exists()) {
 				oDirectory.delete();
 			}
-			
+
 			Utils.zipDirectory(getGunFunAppPhotoLocation(), backupFolderLocation);
-			
+
 		}
 
 		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("MANUALS")) {
 			backedUpItems.add("Manuals");
-			
+
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " MANUALS.zip";
-			
+
 			File oDirectory = new File(backupFolderLocation);
 			if (oDirectory.exists()) {
 				oDirectory.delete();
 			}
-			
+
 			Utils.zipDirectory(getGunFunAppManualLocation(), backupFolderLocation);
-			
+
 		}
 
 		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("PROPERTIES")) {
 			backedUpItems.add("Properties");
-			
+
 			Path resourceDirectory = Paths.get("src", "main", "resources");
 			String pathToResources = resourceDirectory.toFile().getAbsolutePath() + "\\application.properties";
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " application.properties";
-			
+
 			File oDirectory = new File(backupFolderLocation);
 			if (oDirectory.exists()) {
 				oDirectory.delete();
 			}
-			
+
 			Utils.copyFile(pathToResources, backupFolderLocation);
 		}
 
@@ -1672,6 +1674,10 @@ public class AppController {
 			}
 		}
 
+	}
+
+	public boolean getBuildSampleAssets() {
+		return Boolean.valueOf(env.getProperty("BUILD_SAMPLE_ASSETS"));
 	}
 
 	public String getDeleteMasterPassword() {

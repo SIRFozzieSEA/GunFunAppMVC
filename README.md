@@ -27,10 +27,12 @@ To get the project running for the first time (build tables, app folders, sample
 - Database should be rebuilt now and will show up in the path. Next we'll revert to default values for normal operation.
 - Edit the key `spring.jpa.hibernate.ddl-auto` value to `none`.
 - Edit the key `spring.datasource.initialization-mode` value to `never`.
+- Edit the key `BUILD_SAMPLE_ASSETS` value to `true`.
 - Save the file.  If the application is still running, the devtools should reload the context automatically.
 - Click to launch the app.  Default URL is `http://localhost:9002/`
 - The first run should trigger the rebuild of the assets folder and the start page should show four (4) firearms registered.
-- Comment out the `UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());` (line 106) in `AppController.java` to disable this rebuild logic.
+- Edit the key `BUILD_SAMPLE_ASSETS` value to `false`.
+- Save the `application.properties` file for one last time.
 - That's it!  Have fun!
 
 ### Other Notes
