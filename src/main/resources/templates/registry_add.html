@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<title>GunFun App</title>
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body onLoad="document.f1.nickname.focus()">
+	<form name="f1" action="#" th:action="@{/registry_add}" th:object="${gunRegistry}" method="post" enctype="multipart/form-data">
+
+		<table align="center" border="0">
+
+			<tr>
+				<td class="main-table-bold-header" th:text="${reportTitle}">-</td>
+			</tr>
+			<tr>
+				<td class="main-table-fill-break">&nbsp;</td>
+			</tr>
+		
+			<tr>
+				<td>
+					<div align="center" valign="top">
+						<table class="table-search" border="0">
+						
+							<tr>
+								<td valign="top"><span class="field-label">Nickname:</span><br/>
+								<input tabindex="1" th:field="*{nickname}" class="field-label-input" type="text" autocomplete="off" /></td>
+								<td valign="top" rowspan="9">&nbsp;</td>
+								<td colspan="5" rowspan="9" valign="bottom">
+									<img border="2" alt="" height="*" th:src="'/getImage?imageName=_NEW.jpg'" width="550" />
+									<br /><input tabindex="10" style="margin-top: 10px" type="file" name="gunPhoto" accept="image/jpeg" autocomplete="off" />
+								</td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label">Make:<br />
+								<input tabindex="2" th:field="*{make}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td style="height: 36px" valign="top"><span class="field-label">Model:<br/>
+								<input tabindex="3" th:field="*{model}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label">Serial No:<br />
+								<input tabindex="4" th:field="*{serial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label">Caliber:<br />
+								<input tabindex="5" th:field="*{caliber}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label">Barrel:<br />
+								<input tabindex="6" th:field="*{barrelLength}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label">Frame Material:<br />
+								<input tabindex="7" th:field="*{frameMaterial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+					
+							<tr>
+								<td valign="top"><span class="field-label">Purchase Date:<br />
+								<input tabindex="8" th:field="*{purchaseDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label">Purchase Price:<br />
+								<input tabindex="9" th:field="*{purchaseCost}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"></td>
+								<td valign="top">&nbsp;</td>
+								<td valign="top"><span class="field-label">Sighted Date:<br />
+											<input tabindex="11" th:field="*{sightedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<td valign="top"></td>
+								<td valign="top" colspan="3"><font size="2">For 'Sighted Date' anything with an N/A means the sights<BR>will not move. 
+								Anything with a date and a "C" in the field<BR>means it's pretty much complete. Anything else is TBD.</font></td>
+							</tr>
+							
+						</table>
+					</div>
+
+				</td>
+			</tr>
+		
+			<tr>
+				<td class="main-table-fill-break">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="main-table-fill-space">&nbsp;</td>
+			</tr>
+			
+			<tr>
+				<td class="main-table-fill-space"><input name="Submit1" type="submit" value="Submit" /></td>
+			</tr>
+			
+
+		</table>
+
+
+
+	</form>
+</body>
+
+</html>

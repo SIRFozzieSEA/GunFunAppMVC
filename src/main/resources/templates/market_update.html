@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<title>GunFun App</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<style type="text/css">
+.auto-style3 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+}
+.auto-style4 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+}
+.auto-style6 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	background-color: #FFCC00;
+}
+.auto-style8 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: large;
+	font-weight: bold;
+	padding-bottom: 6px;
+}
+.auto-style9 {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+}
+.auto-style10 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.auto-style11 {
+	font-size: small;
+}
+.auto-style12 {
+	font-size: xx-small;
+	padding-bottom: 6px;
+}
+a {
+	color: #000000;
+}
+a:visited {
+	color: #000000;
+}
+</style>
+</head>
+<body style="margin: 20px; background-color: #FFFF99"  onLoad="document.f1.elements[0].focus()">
+<form name="f1" action="#" th:action="@{/market/market_update}" method="post">
+	<table align="center" cellpadding="2" cellspacing="0">
+		<tr>
+			<td class="auto-style8" colspan="4" th:text="${reportTitle}">-</td>
+		</tr>
+		<tr>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;Gun Nickname&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;Make/Model&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;Market Value&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;URL&nbsp;&nbsp;</strong></td>
+		</tr>
+		
+		<tr>
+			<td class="auto-style12" colspan="4"></td>
+		</tr>
+		
+		<tr th:each="row : ${report}">
+		
+			<td class="auto-style9"><NOBR><span class="auto-style9" th:text="${row.get('NICKNAME')}"></span></NOBR></td>
+			<td class="auto-style9" th:text="${row.get('MAKE') + ' ' + row.get('MODEL')}">-</td>
+			<td class="auto-style3"><NOBR><input th:name="${'MARKET_COST_' + row.get('GUN_PK')}" style="text-align: right; width: 80px" value="" type="text" autocomplete="off" /></NOBR></td>
+			<td class="auto-style3"><NOBR><input th:name="${'MARKET_URL_' + row.get('GUN_PK')}" style="width: 200px" value="" type="text" autocomplete="off" /></NOBR></td>
+
+		</tr>
+		
+		<tr>
+			<td colspan="4">&nbsp;</td>
+		</tr>
+		
+		<tr>
+			<td colspan="4" class="auto-style10"><input name="Submit1" type="submit" value="Submit" /></td>
+		</tr>
+	</table>
+</form>
+</body>
+
+</html>

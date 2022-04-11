@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<title>GunFun App</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<style type="text/css">
+.auto-style3 {
+	text-align: right;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	padding-bottom: 7px;
+}
+.auto-style4 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	padding-bottom: 7px;
+}
+.auto-style6 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	background-color: #FFCC00;
+}
+.auto-style6a {
+	text-align: right;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	background-color: #FFCC00;
+}
+.auto-style8 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: large;
+	font-weight: bold;
+	padding-bottom: 6px;
+}
+.auto-style9 {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	padding-bottom: 7px;
+}
+.auto-style10 {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.auto-style11 {
+	font-size: small;
+}
+.auto-style12 {
+	font-size: xx-small;
+	padding-bottom: 6px;
+}
+a {
+	color: #000000;
+}
+a:visited {
+	color: #000000;
+}
+</style>
+</head>
+<body style="margin: 20px; background-color: #FFFF99">
+	<table align="center" cellpadding="2" cellspacing="0">
+		<tr>
+			<td class="auto-style8" colspan="10" th:text="${reportTitle}">-</td>
+		</tr>
+		<tr>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;Gun&nbsp;&nbsp;<br/>&nbsp;&nbsp;Nickname&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;Make/Model&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>Purchase<br/>Cost</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>Market<br/>Value</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>Market<br/>Average</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;Market&nbsp;&nbsp;<br/>&nbsp;&nbsp;Date&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;URL&nbsp;&nbsp;</strong></td>
+		</tr>
+		
+		<tr>
+			<td class="auto-style12" colspan="10"></td>
+		</tr>
+		
+		<tr th:each="row : ${report}">
+		
+			<td class="auto-style9"><NOBR><span class="auto-style9" th:text="${row.get('NICKNAME')}"></span></NOBR></td>
+			<td class="auto-style9" th:text="${row.get('MAKE') + ' ' + row.get('MODEL')}">-</td>
+			<td class="auto-style3"><NOBR><span class="auto-style9" th:text="'$' + ${#strings.replace(row.get('PURCHASE_COST'),'.00','')}"></span></NOBR></td>
+			<td class="auto-style3"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style3"><NOBR><span class="auto-style9" th:text="'$' + ${#strings.replace(row.get('MARKET_COST'),'.00','')}"></span></NOBR></td>
+			<td class="auto-style3"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style3"><NOBR><strong>
+			
+			<div th:if="${#strings.startsWith(row.get('CURRENT_VALUE_CHANGE'), '-')}">
+			  <font color="red">
+			</div>
+			<div th:unless="${#strings.startsWith(row.get('CURRENT_VALUE_CHANGE'), '-')}">
+			  <font color="green">
+			</div>
+			
+			<span class="auto-style9" th:text="'$' + ${#strings.replace(row.get('CURRENT_VALUE_CHANGE'),'.00','')}"></span>
+			
+			</font>
+			
+			</strong></NOBR></td>
+			<td class="auto-style3"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style3"><NOBR><span class="auto-style9" th:text="${row.get('MARKET_COST_DATE')}"></span></NOBR></td>
+
+			
+			<div th:if="${#strings.startsWith(row.get('MARKET_URL'), 'http')}">
+				<td class="auto-style4"><NOBR><a th:href="${row.get('MARKET_URL')}" target="_blank">X</a></span></NOBR></td>
+			</div>
+			<div th:unless="${#strings.startsWith(row.get('MARKET_URL'), 'http')}">
+				<td class="auto-style4">&nbsp;</td>
+			</div>
+			
+
+		</tr>
+		
+		<tr>
+			<td class="auto-style6"><strong>&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;</strong></td>
+			<td class="auto-style6a"><strong><span class="auto-style9" th:text="'$' + ${SUM_PC}"></span></strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6a"><strong><span class="auto-style9" th:text="'$' + ${SUM_MK}"></span></strong></td>
+			<td class="auto-style6"><strong>&nbsp;&nbsp;</strong></td>
+			<td class="auto-style6a"><strong>
+			
+			<div th:if="${#strings.startsWith(SUM_DIFF, '-')}">
+			  <font color="red">
+			</div>
+			<div th:unless="${#strings.startsWith(SUM_DIFF, '-')}">
+			  <font color="green">
+			</div>
+			
+			<span class="auto-style9" th:text="'$' + ${SUM_DIFF}"></span>
+			
+			</font>
+			
+			</strong></td>
+			<td class="auto-style6"><strong>&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;</strong></td>
+			<td class="auto-style6"><strong>&nbsp;</strong></td>
+		</tr>
+		
+
+	</table>
+</body>
+
+</html>
