@@ -1,5 +1,13 @@
 # GunFunApp
 
+### Purpose
+
+The purpose of the application was a way for me to keep track of my guns.  The app can track basic information about each gun, how many bullets  fired through it, when it was last cleaned, when it was last carried, etc.  You can log your daily carry, cleanings, shots, and provide basic reporting on those metrics. There is also a basic quiz feature built in as well... in order to use this feature, you would need to click on `Rebuild Questions` on the main navigation then you should be able to click on `Quiz` to launch a quiz session.
+
+### Requirements
+
+This was designed to work with Java 17.x, your mileage may vary using anything other than that.  The application is backed with an embedded H2 database which gets stored locally on your PC.
+
 ### Getting Started
 
 To get the project running for the first time (build tables, app folders, sample images/pdfs, etc.) do the following:
