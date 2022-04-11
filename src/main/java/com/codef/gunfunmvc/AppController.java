@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -110,7 +112,7 @@ public class AppController {
 		} catch (SQLException e) {
 			// Database cannot be connected to, most likely BitLocker
 			e.printStackTrace();
-			// return "index_nc";
+			return "index_nc";
 		}
 		return "index";
 	}
@@ -1106,77 +1108,123 @@ public class AppController {
 	}
 
 	@GetMapping("/function/backup")
-	public String functionBackup(Model model) throws ClassNotFoundException, SQLException, IOException {
+	public String functionBackup(HttpServletRequest request, Model model)
+			throws ClassNotFoundException, SQLException, IOException {
 
-		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+		ArrayList<String> backedUpItems = new ArrayList<String>();
 
-		String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
-				+ new Date(System.currentTimeMillis()).toString() + " TAB";
+		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("DATA")) {
+			backedUpItems.add("Data");
 
-		File oDirectory = new File(backupFolderLocation);
-		if (!oDirectory.exists()) {
-			oDirectory.mkdirs();
+			Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+
+			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
+					+ new Date(System.currentTimeMillis()).toString() + " DATA TAB";
+
+			File oDirectory = new File(backupFolderLocation);
+			if (!oDirectory.exists()) {
+				oDirectory.mkdirs();
+			}
+
+			String tableName = "carry_sessions";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "cleaning_reports";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "cleaning_sessions";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "registry";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "roles";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "shooting_sessions";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "users";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "valid_calibers";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "trivia_question_templates";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "trivia_question_templates_custom";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "trivia_rounds";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			tableName = "trivia_round_questions";
+			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+					backupFolderLocation + "\\" + tableName + ".tab", true);
+
+			conn.close();
 		}
 
-		String tableName = "carry_sessions";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
+		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("IMAGES")) {
+			backedUpItems.add("Images");
 
-		tableName = "cleaning_reports";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
+			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
+					+ new Date(System.currentTimeMillis()).toString() + " IMAGES.zip";
+			
+			File oDirectory = new File(backupFolderLocation);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
+			
+			Utils.zipDirectory(getGunFunAppPhotoLocation(), backupFolderLocation);
+			
+		}
 
-		tableName = "cleaning_sessions";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
+		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("MANUALS")) {
+			backedUpItems.add("Manuals");
+			
+			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
+					+ new Date(System.currentTimeMillis()).toString() + " MANUALS.zip";
+			
+			File oDirectory = new File(backupFolderLocation);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
+			
+			Utils.zipDirectory(getGunFunAppManualLocation(), backupFolderLocation);
+			
+		}
 
-		tableName = "registry";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
+		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("PROPERTIES")) {
+			backedUpItems.add("Properties");
+			
+			Path resourceDirectory = Paths.get("src", "main", "resources");
+			String pathToResources = resourceDirectory.toFile().getAbsolutePath() + "\\application.properties";
+			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
+					+ new Date(System.currentTimeMillis()).toString() + " application.properties";
+			
+			File oDirectory = new File(backupFolderLocation);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
+			
+			Utils.copyFile(pathToResources, backupFolderLocation);
+		}
 
-		tableName = "roles";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "shooting_sessions";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "users";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "valid_calibers";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "trivia_question_templates";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "trivia_question_templates_custom";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "trivia_rounds";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		tableName = "trivia_round_questions";
-		Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-				backupFolderLocation + "\\" + tableName + ".tab", true);
-
-		conn.close();
-
-		backupFolderLocation = getGunFunAppLocation() + "\\_backup\\" + new Date(System.currentTimeMillis()).toString()
-				+ " IMAGES.zip";
-		Utils.zipDirectory(getGunFunAppPhotoLocation(), backupFolderLocation);
-
-		backupFolderLocation = getGunFunAppLocation() + "\\_backup\\" + new Date(System.currentTimeMillis()).toString()
-				+ " MANUALS.zip";
-		Utils.zipDirectory(getGunFunAppManualLocation(), backupFolderLocation);
-
-		model.addAttribute("MESSAGE", "Backup files have been generated.");
+		String backedUpItemsDisplay = backedUpItems.toString().replaceAll("\\[", "").replaceAll("\\]", "");
+		model.addAttribute("MESSAGE", "Items backed up: " + backedUpItemsDisplay);
 
 		return "frame_main";
 

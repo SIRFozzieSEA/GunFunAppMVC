@@ -102,20 +102,33 @@ public class UtilsBuildConvert {
 
 	}
 
-	public static void checkDataFoldersBuilt(String pathToAppSourceFolder) throws IOException {
+	public static void checkDataFoldersBuilt(String pathToAppFolder) throws IOException {
 
-		Path resourceDirectory = Paths.get("src", "main", "resources", "sample_app_assets");
-		String pathToResources = resourceDirectory.toFile().getAbsolutePath();
+		Path sampleAssetsPath = Paths.get("src", "main", "resources", "sample_app_assets");
+		String pathToSampleResources = sampleAssetsPath.toFile().getAbsolutePath();
 
-		makeFolderWithAssets(pathToAppSourceFolder, pathToResources, "\\_images\\");
-		makeFolderWithAssets(pathToAppSourceFolder, pathToResources, "\\_images\\large\\");
-		makeFolderWithAssets(pathToAppSourceFolder, pathToResources, "\\_images\\medium\\");
-		makeFolderWithAssets(pathToAppSourceFolder, pathToResources, "\\_images\\small\\");
-		makeFolderWithAssets(pathToAppSourceFolder, pathToResources, "\\_manuals\\");
+		checkBackupScriptBuilt(pathToSampleResources, pathToAppFolder);
+		makeFolderWithAssets(pathToSampleResources, pathToAppFolder, "\\_images\\");
+		makeFolderWithAssets(pathToSampleResources, pathToAppFolder, "\\_images\\large\\");
+		makeFolderWithAssets(pathToSampleResources, pathToAppFolder, "\\_images\\medium\\");
+		makeFolderWithAssets(pathToSampleResources, pathToAppFolder, "\\_images\\small\\");
+		makeFolderWithAssets(pathToSampleResources, pathToAppFolder, "\\_manuals\\");
 
 	}
+	
+	public static void checkBackupScriptBuilt(String pathToSampleResources, String pathToAppFolder) throws IOException {
+		
+		String backupScript = "\\_data\\BackupH2Data.bat";
+		String sourceScriptPath = pathToSampleResources + backupScript;
+		String targetScriptPath = pathToAppFolder + backupScript;
+		File oDirectory = new File(targetScriptPath);
+		if (!oDirectory.exists()) {
+			Utils.copyFile(sourceScriptPath, targetScriptPath);
+		}
+		
+	}
 
-	public static void makeFolderWithAssets(String pathToAppSourceFolder, String pathToResources, String resourceFolder)
+	public static void makeFolderWithAssets(String pathToSampleResources, String pathToAppFolder, String resourceFolder)
 			throws IOException {
 
 		ArrayList<String> standards = new ArrayList<String>(Arrays.asList("_NEW", "_NOT_FOUND"));
@@ -123,7 +136,7 @@ public class UtilsBuildConvert {
 		String extension = resourceFolder.contains("manual") ? ".pdf" : ".jpg";
 
 		boolean directoryMade = false;
-		String appFolder = pathToAppSourceFolder + resourceFolder;
+		String appFolder = pathToAppFolder + resourceFolder;
 		File oDirectory = new File(appFolder);
 		if (!oDirectory.exists()) {
 			oDirectory.mkdirs();
@@ -133,16 +146,16 @@ public class UtilsBuildConvert {
 		if (directoryMade) {
 			if (resourceFolder.equals("\\_images\\")) {
 				for (String singleStandards : standards) {
-					Utils.copyFile(pathToResources + resourceFolder + singleStandards + extension,
+					Utils.copyFile(pathToSampleResources + resourceFolder + singleStandards + extension,
 							appFolder + "\\" + singleStandards + extension);
 				}
 			} else {
 				for (String singleNickname : nickNames) {
-					Utils.copyFile(pathToResources + resourceFolder + singleNickname + extension,
+					Utils.copyFile(pathToSampleResources + resourceFolder + singleNickname + extension,
 							appFolder + "\\" + singleNickname + extension);
 				}
 				if (extension.equals(".pdf")) {
-					Utils.copyFile(pathToResources + resourceFolder + "_NOT_FOUND" + extension,
+					Utils.copyFile(pathToSampleResources + resourceFolder + "_NOT_FOUND" + extension,
 							appFolder + "\\" + "_NOT_FOUND" + extension);
 				}
 			}

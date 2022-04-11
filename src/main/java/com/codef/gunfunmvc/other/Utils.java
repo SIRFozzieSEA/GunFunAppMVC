@@ -305,9 +305,6 @@ public class Utils {
 	}
 
 	public static synchronized void writeStringToFile(String stringToWrite, String filePath) throws IOException {
-
-		System.out.println(filePath);
-
 		Files.write(Paths.get(filePath), stringToWrite.getBytes());
 	}
 
