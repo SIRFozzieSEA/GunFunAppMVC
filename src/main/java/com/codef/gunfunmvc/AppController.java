@@ -106,10 +106,7 @@ public class AppController {
 
 			Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 			if (getBuildSampleAssets()) {
-				System.out.println("doing it");
 				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
-			} else {
-				System.out.println("not doing it");
 			}
 			processCleaningReport(conn);
 			conn.close();
