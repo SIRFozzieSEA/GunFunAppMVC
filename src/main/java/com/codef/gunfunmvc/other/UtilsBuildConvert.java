@@ -27,8 +27,8 @@ public class UtilsBuildConvert {
 	 * 
 
 			// This is really only used to converting over data from old schema
-			GunFunBuildConvertUtils.checkDataFoldersBuilt(getGunFunAppLocation());
-			GunFunBuildConvertUtils.convertOldData(conn, connSlave, gunRegistryRepo, gunCarrySessionsRepo,
+			UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
+			UtilsBuildConvert.convertOldData(conn, connSlave, gunRegistryRepo, gunCarrySessionsRepo,
 					gunCleaningSessionsRepo, gunShootingSessionsRepo);
 
 	 * 

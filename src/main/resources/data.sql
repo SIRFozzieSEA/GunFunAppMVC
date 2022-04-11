@@ -22,21 +22,19 @@ INSERT INTO trivia_question_templates_custom (question_type, question, question_
 INSERT INTO trivia_question_templates_custom (question_type, question, question_responses, correct_response, image_location, nickname) 
 	VALUES ('MULTIPLE_CHOICE', 'What gun model does James Bond traditionally use?', 'PPK|PPP|PPS|PPQ', 'PPK', '', '');
 
-/*
 INSERT INTO REGISTRY (NICKNAME, MAKE, MODEL, SERIAL, CALIBER, BARREL_LENGTH, 
 	FRAME_MATERIAL, PURCHASE_COST, PURCHASE_DATE, SIGHTED_DATE, MARKET_COST, MARKET_COST_DATE, MARKET_URL, GUN_IS_DIRTY) VALUES (
 	'Teresa', 'Walther', 'PPK/S', 'SERIAL_01', '380 Auto', 3.0, 'Metal', '500.00', '2021-01-01', '2021-02-02', 600.00, 
-	'2022-03-03', 'http://www.fozden.com', '0');
+	'2022-03-03', 'http://www.fozden.com', false);
 INSERT INTO REGISTRY (NICKNAME, MAKE, MODEL, SERIAL, CALIBER, BARREL_LENGTH, 
 	FRAME_MATERIAL, PURCHASE_COST, PURCHASE_DATE, SIGHTED_DATE, MARKET_COST, MARKET_COST_DATE, MARKET_URL, GUN_IS_DIRTY) VALUES (
 	'Alex', 'Beretta', 'APX', 'SERIAL_02', '9mm', 4.0, 'Composite', '600.00', '2000-01-01', '2000-02-02', 600.00, 
-	'2001-03-03', 'http://www.fozden.com', '0');
+	'2001-03-03', 'http://www.fozden.com', false);
 INSERT INTO REGISTRY (NICKNAME, MAKE, MODEL, SERIAL, CALIBER, BARREL_LENGTH, 
 	FRAME_MATERIAL, PURCHASE_COST, PURCHASE_DATE, SIGHTED_DATE, MARKET_COST, MARKET_COST_DATE, MARKET_URL, GUN_IS_DIRTY) VALUES (
 	'Valerie', 'Heckler & Koch', 'VP9', 'SERIAL_03', '9mm', 4.0, 'Composite', '700.00', '2010-01-01', '2010-02-02', 800.00, 
-	'2011-03-03', 'http://www.fozden.com', '0');
+	'2011-03-03', 'http://www.fozden.com', false);
 INSERT INTO REGISTRY (NICKNAME, MAKE, MODEL, SERIAL, CALIBER, BARREL_LENGTH, 
 	FRAME_MATERIAL, PURCHASE_COST, PURCHASE_DATE, SIGHTED_DATE, MARKET_COST, MARKET_COST_DATE, MARKET_URL, GUN_IS_DIRTY) VALUES (
 	'Harriet', 'Smith & Wesson', '686+', 'SERIAL_04', '357 Magnum', 4.0, 'Metal', '750.00', '2010-01-05', '2010-02-05', 850.00, 
-	'2011-03-05', 'http://www.fozden.com', '0');
-*/
+	'2011-03-05', 'http://www.fozden.com', false);

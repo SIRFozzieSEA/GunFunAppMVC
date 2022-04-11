@@ -49,6 +49,7 @@ import com.codef.gunfunmvc.models.entities.TriviaRound;
 import com.codef.gunfunmvc.models.entities.TriviaRoundQuestion;
 import com.codef.gunfunmvc.models.entities.ValidCaliber;
 import com.codef.gunfunmvc.other.Utils;
+import com.codef.gunfunmvc.other.UtilsBuildConvert;
 import com.codef.gunfunmvc.repos.CarrySessionRepo;
 import com.codef.gunfunmvc.repos.CleaningSessionRepo;
 import com.codef.gunfunmvc.repos.RegistryRepo;
@@ -96,21 +97,13 @@ public class AppController {
 	 * Main App Windows
 	 */
 
-	// TODO: Rename project to GunFunMVC and put in new repo
-	// TODO: A way to customize template questions
-	// TODO: Break out data backup -- data, images, manuals -- SQL for rebuilding database from scratch?
-	// TODO: Sorting on some pages
-	// TODO: Preference page????
-	// TODO: Limit history to so many months
-
-	// START CONVERTED CODE --------------------------------------
-
 	@GetMapping("/")
 	public String indexLaunch(Model model) throws SQLException, IOException {
 
 		try {
 
 			Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+			UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
 			processCleaningReport(conn);
 			conn.close();
 
