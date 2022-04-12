@@ -109,6 +109,12 @@ public class AppController {
 				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
 			}
 			processCleaningReport(conn);
+			
+			System.out.println("DEFAULT_EDC is: " + getPreferenceStringValue(conn, "DEFAULT_EDC"));
+			System.out.println("DISABLE_LOGINS is: " + getPreferenceBooleanValue(conn, "DISABLE_LOGINS"));
+			System.out.println("MAX_REPORT_DAYS is: " + getPreferenceLongValue(conn, "MAX_REPORT_DAYS"));
+			System.out.println("TAX_RATE is: " + getPreferenceDoubleValue(conn, "TAX_RATE"));
+			
 			conn.close();
 
 		} catch (SQLException e) {
@@ -116,6 +122,11 @@ public class AppController {
 			e.printStackTrace();
 			return "index_nc";
 		}
+		
+		
+		
+		
+		
 		return "index";
 	}
 
@@ -1674,6 +1685,30 @@ public class AppController {
 			}
 		}
 
+	}
+
+	public String getPreferenceStringValue(Connection conn, String prefName) throws SQLException {
+		return Utils.getStringValueFromTable(conn, "SELECT PREFERENCE_VALUE FROM PREFERENCES WHERE PREFERENCE_KEY = '"
+				+ prefName + "' AND PREFERENCE_TYPE = 'String'", "PREFERENCE_VALUE");
+	}
+
+	public boolean getPreferenceBooleanValue(Connection conn, String prefName) throws SQLException {
+		return Boolean.parseBoolean(
+				Utils.getStringValueFromTable(conn, "SELECT PREFERENCE_VALUE FROM PREFERENCES WHERE PREFERENCE_KEY = '"
+						+ prefName + "' AND PREFERENCE_TYPE = 'Boolean'", "PREFERENCE_VALUE"));
+	}
+
+	public long getPreferenceLongValue(Connection conn, String prefName) throws NumberFormatException, SQLException {
+		return Long.parseLong(
+				Utils.getStringValueFromTable(conn, "SELECT PREFERENCE_VALUE FROM PREFERENCES WHERE PREFERENCE_KEY = '"
+						+ prefName + "' AND PREFERENCE_TYPE = 'Long'", "PREFERENCE_VALUE"));
+	}
+
+	public double getPreferenceDoubleValue(Connection conn, String prefName)
+			throws NumberFormatException, SQLException {
+		return Double.parseDouble(
+				Utils.getStringValueFromTable(conn, "SELECT PREFERENCE_VALUE FROM PREFERENCES WHERE PREFERENCE_KEY = '"
+						+ prefName + "' AND PREFERENCE_TYPE = 'Double'", "PREFERENCE_VALUE"));
 	}
 
 	public boolean getBuildSampleAssets() {

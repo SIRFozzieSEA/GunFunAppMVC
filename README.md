@@ -37,12 +37,12 @@ To get the project running for the first time (build tables, app folders, sample
 
 ### Other Notes
 
-- The backup feature allows you to backup when the application is running.  Data will be exported as tab delimited files, images will be backed up in a .zip file, manuals will be backed up in a .zip file as well.  Backing up the properties file will result in a single file.  All backups are prefixed by the data, and will be written into the `[GUNFUN_APP_FOLDER]\_backup` folder.  Also included in the `[GUNFUN_APP_FOLDER]\_data` folder is a .bat script that will copy the raw H2 data file... the database should **not be running** when this script is executed to make sure all data is copied.
+- The backup feature allows you to backup when the application is running.  Data will be exported as tab delimited files, images will be backed up in a .zip file, manuals will be backed up in a .zip file as well.  Backing up the properties file will result in a single file.  All backups are prefixed by the date, and will be written into the `[GUNFUN_APP_FOLDER]\_backup` folder.  Also included in the `[GUNFUN_APP_FOLDER]\_data` folder is a .bat script that will copy the raw H2 data file... the database should **not be running** when this script is executed to make sure all data is copied.
 
 
 ### 'To Do' List
 - A way to customize template questions
 - Sorting on some pages
-- Preference page????
-- Limit history to so many months
+- Manage preference page
+- Limit history to so many days
 - Fix backup independence (generate SQL create files?)
