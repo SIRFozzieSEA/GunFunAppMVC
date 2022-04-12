@@ -109,12 +109,6 @@ public class AppController {
 				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
 			}
 			processCleaningReport(conn);
-			
-			System.out.println("DEFAULT_EDC is: " + getPreferenceStringValue(conn, "DEFAULT_EDC"));
-			System.out.println("DISABLE_LOGINS is: " + getPreferenceBooleanValue(conn, "DISABLE_LOGINS"));
-			System.out.println("MAX_REPORT_DAYS is: " + getPreferenceLongValue(conn, "MAX_REPORT_DAYS"));
-			System.out.println("TAX_RATE is: " + getPreferenceDoubleValue(conn, "TAX_RATE"));
-			
 			conn.close();
 
 		} catch (SQLException e) {
