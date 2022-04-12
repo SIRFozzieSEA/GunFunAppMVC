@@ -44,5 +44,5 @@ To get the project running for the first time (build tables, app folders, sample
 - A way to customize template questions
 - Sorting on some pages
 - Manage preference page
-- Limit history to so many days
 - Fix backup independence (generate SQL create files?)
+- On detail - last carried, last cleaned, last fired

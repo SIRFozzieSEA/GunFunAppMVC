@@ -347,11 +347,17 @@ public class AppController {
 	 */
 
 	@GetMapping("/log/shot")
-	public String logShot(Model model) throws SQLException, IOException {
+	public String logShot(HttpServletRequest request, Model model) throws SQLException, IOException {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Shot Log");
-		String sql = "SELECT SHOOT_PK, NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED FROM shooting_sessions ORDER by DATE_FIRED DESC, NICKNAME";
+		String whereClause = "WHERE DATE_FIRED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_SHOT")
+				+ ", CURRENT_DATE)";
+		if (request.getParameter("show") != null) {
+			whereClause = "";
+		}
+		String sql = "SELECT SHOOT_PK, NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED FROM shooting_sessions "
+				+ whereClause + " ORDER by DATE_FIRED DESC, NICKNAME";
 		model.addAttribute("report",
 				Utils.makeSQLAsArrayListHashMap(conn, sql, "DATE_FIRED", null, null, "NO_OF_ROUNDS"));
 		model.addAttribute("allCaliberSet", getAllCaliberValues());
@@ -470,11 +476,17 @@ public class AppController {
 	}
 
 	@GetMapping("/log/carry")
-	public String logCarry(Model model) throws SQLException, IOException {
+	public String logCarry(HttpServletRequest request, Model model) throws SQLException, IOException {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Carry Log");
-		String sql = "SELECT CARRY_PK, NICKNAME, DATE_CARRIED, DAY_OF_WEEK FROM carry_sessions ORDER by DATE_CARRIED DESC, NICKNAME";
+		String whereClause = "WHERE DATE_CARRIED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_CARRY")
+				+ ", CURRENT_DATE)";
+		if (request.getParameter("show") != null) {
+			whereClause = "";
+		}
+		String sql = "SELECT CARRY_PK, NICKNAME, DATE_CARRIED, DAY_OF_WEEK FROM carry_sessions " + whereClause
+				+ " ORDER by DATE_CARRIED DESC, NICKNAME";
 		model.addAttribute("report",
 				Utils.makeSQLAsArrayListHashMap(conn, sql, "DATE_CARRIED", "DAY_OF_WEEK", "Sunday", null));
 		conn.close();
@@ -593,11 +605,17 @@ public class AppController {
 	}
 
 	@GetMapping("/log/cleaning")
-	public String logCleaning(Model model) throws SQLException, IOException {
+	public String logCleaning(HttpServletRequest request, Model model) throws SQLException, IOException {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Cleaning Log");
-		String sql = "SELECT CLEAN_PK, NICKNAME, DATE_CLEANED FROM cleaning_sessions ORDER by DATE_CLEANED DESC, NICKNAME";
+		String whereClause = "WHERE DATE_CLEANED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_CLEANING")
+				+ ", CURRENT_DATE)";
+		if (request.getParameter("show") != null) {
+			whereClause = "";
+		}
+		String sql = "SELECT CLEAN_PK, NICKNAME, DATE_CLEANED FROM cleaning_sessions " + whereClause
+				+ " ORDER by DATE_CLEANED DESC, NICKNAME";
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, "DATE_CLEANED", null, null, null));
 		conn.close();
 
