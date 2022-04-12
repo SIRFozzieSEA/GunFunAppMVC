@@ -116,11 +116,7 @@ public class AppController {
 			e.printStackTrace();
 			return "index_nc";
 		}
-		
-		
-		
-		
-		
+
 		return "index";
 	}
 
