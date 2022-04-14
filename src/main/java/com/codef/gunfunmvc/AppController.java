@@ -889,21 +889,9 @@ public class AppController {
 			long gunPkToDelete = gunRegistry.getGunPk();
 			String nickname = gunRegistry.getNickname();
 
-			try {
-				Utils.deleteFile(getGunFunAppPhotoLocation() + "large\\" + nickname + ".jpg");
-			} catch (IOException e) {
-			}
-
-			try {
-				Utils.deleteFile(getGunFunAppPhotoLocation() + "medium\\" + nickname + ".jpg");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				Utils.deleteFile(getGunFunAppPhotoLocation() + "small\\" + nickname + ".jpg");
-			} catch (IOException e) {
-			}
+			Utils.deleteFile(getGunFunAppPhotoLocation() + "large\\" + nickname + ".jpg");
+			Utils.deleteFile(getGunFunAppPhotoLocation() + "medium\\" + nickname + ".jpg");
+			Utils.deleteFile(getGunFunAppPhotoLocation() + "small\\" + nickname + ".jpg");
 
 			Utils.executeSQL(conn, "DELETE FROM cleaning_reports where NICKNAME='" + nickname + "'");
 			Utils.executeSQL(conn, "DELETE FROM carry_sessions where NICKNAME='" + nickname + "'");
@@ -1141,7 +1129,7 @@ public class AppController {
 
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " DATA TAB";
-			
+
 			Utils.deleteFile(backupFolderLocation);
 
 			ArrayList<String> tableList = new ArrayList<>(
@@ -1163,7 +1151,7 @@ public class AppController {
 					+ new Date(System.currentTimeMillis()).toString() + " IMAGES.zip";
 
 			Utils.deleteFile(backupFolderLocation);
-			
+
 			Utils.zipDirectory(getGunFunAppPhotoLocation(), backupFolderLocation);
 
 		}
@@ -1189,7 +1177,7 @@ public class AppController {
 					+ new Date(System.currentTimeMillis()).toString() + " application.properties";
 
 			Utils.deleteFile(backupFolderLocation);
-			
+
 			Utils.copyFile(pathToResources, backupFolderLocation);
 		}
 

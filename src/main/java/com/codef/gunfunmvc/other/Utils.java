@@ -61,9 +61,13 @@ public class Utils {
 		}
 	}
 
-	public static void deleteFile(String pathToFile) throws IOException {
+	public static void deleteFile(String pathToFile) {
 		Path filePath = Paths.get(pathToFile);
-		Files.delete(filePath);
+		try {
+			Files.delete(filePath);
+		} catch (IOException e) {
+			// this will be okay
+		}
 	}
 
 	public static void copyFile(String sourceFile, String targetFile) throws IOException {
