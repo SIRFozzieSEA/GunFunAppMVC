@@ -1164,7 +1164,10 @@ public class AppController {
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " IMAGES.zip";
 
-			Utils.deleteFile(backupFolderLocation);
+			File oDirectory = new File(backupFolderLocation);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
 
 			Utils.zipDirectory(getGunFunAppPhotoLocation(), backupFolderLocation);
 
@@ -1176,7 +1179,10 @@ public class AppController {
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " MANUALS.zip";
 
-			Utils.deleteFile(backupFolderLocation);
+			File oDirectory = new File(backupFolderLocation);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
 
 			Utils.zipDirectory(getGunFunAppManualLocation(), backupFolderLocation);
 
@@ -1190,7 +1196,10 @@ public class AppController {
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " application.properties";
 
-			Utils.deleteFile(backupFolderLocation);
+			File oDirectory = new File(backupFolderLocation);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
 
 			Utils.copyFile(pathToResources, backupFolderLocation);
 		}
