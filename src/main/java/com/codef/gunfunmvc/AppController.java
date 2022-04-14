@@ -897,6 +897,7 @@ public class AppController {
 			try {
 				Utils.deleteFile(getGunFunAppPhotoLocation() + "medium\\" + nickname + ".jpg");
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 
 			try {
