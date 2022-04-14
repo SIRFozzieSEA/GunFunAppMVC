@@ -889,9 +889,20 @@ public class AppController {
 			long gunPkToDelete = gunRegistry.getGunPk();
 			String nickname = gunRegistry.getNickname();
 
-			Utils.deleteFile(getGunFunAppPhotoLocation() + "large\\" + nickname + ".jpg");
-			Utils.deleteFile(getGunFunAppPhotoLocation() + "medium\\" + nickname + ".jpg");
-			Utils.deleteFile(getGunFunAppPhotoLocation() + "small\\" + nickname + ".jpg");
+			try {
+				Utils.deleteFile(getGunFunAppPhotoLocation() + "large\\" + nickname + ".jpg");
+			} catch (IOException e) {
+			}
+
+			try {
+				Utils.deleteFile(getGunFunAppPhotoLocation() + "medium\\" + nickname + ".jpg");
+			} catch (IOException e) {
+			}
+
+			try {
+				Utils.deleteFile(getGunFunAppPhotoLocation() + "small\\" + nickname + ".jpg");
+			} catch (IOException e) {
+			}
 
 			Utils.executeSQL(conn, "DELETE FROM cleaning_reports where NICKNAME='" + nickname + "'");
 			Utils.executeSQL(conn, "DELETE FROM carry_sessions where NICKNAME='" + nickname + "'");
