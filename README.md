@@ -46,3 +46,4 @@ To get the project running for the first time (build tables, app folders, sample
 - Manage preference page
 - Fix backup independence (generate SQL create files?)
 - On detail - last carried, last cleaned, last fired
+- delete password change
