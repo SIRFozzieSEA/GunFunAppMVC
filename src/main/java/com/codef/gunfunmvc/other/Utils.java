@@ -61,17 +61,13 @@ public class Utils {
 		}
 	}
 
-	public static void deleteFile(String pathToFile) {
-		Path filePath = Paths.get(pathToFile);
-		try {
-			Files.delete(filePath);
-		} catch (IOException e) {
-			// this will be okay
-		}
-	}
-
 	public static void copyFile(String sourceFile, String targetFile) throws IOException {
 		Files.copy(new File(sourceFile).toPath(), new File(targetFile).toPath());
+	}
+
+	public static void deleteFile(String pathToFile) throws IOException {
+		Path filePath = Paths.get(pathToFile);
+		Files.delete(filePath);
 	}
 
 	public static Connection getAccessConnection(String accessDbPath) throws ClassNotFoundException, SQLException {
