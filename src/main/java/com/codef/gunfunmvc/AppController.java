@@ -609,8 +609,8 @@ public class AppController {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Cleaning Log");
-		String whereClause = "WHERE DATE_CLEANED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_CLEANING")
-				+ ", CURRENT_DATE)";
+		String whereClause = "WHERE DATE_CLEANED > DATEADD('DAY', "
+				+ getPreferenceLongValue(conn, "MAX_LOG_DAYS_CLEANING") + ", CURRENT_DATE)";
 		if (request.getParameter("show") != null) {
 			whereClause = "";
 		}
@@ -1147,53 +1147,14 @@ public class AppController {
 				oDirectory.mkdirs();
 			}
 
-			String tableName = "carry_sessions";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "cleaning_reports";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "cleaning_sessions";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "registry";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "roles";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "shooting_sessions";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "users";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "valid_calibers";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "trivia_question_templates";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "trivia_question_templates_custom";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "trivia_rounds";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
-
-			tableName = "trivia_round_questions";
-			Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-					backupFolderLocation + "\\" + tableName + ".tab", true);
+			ArrayList<String> tableList = new ArrayList<>(
+					Arrays.asList("carry_sessions", "cleaning_reports", "cleaning_sessions", "registry", "roles",
+							"shooting_sessions", "users", "valid_calibers", "trivia_question_templates",
+							"trivia_question_templates_custom", "trivia_rounds", "trivia_round_questions"));
+			for (String tableName : tableList) {
+				Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
+						backupFolderLocation + "\\" + tableName + ".tab", true);
+			}
 
 			conn.close();
 		}

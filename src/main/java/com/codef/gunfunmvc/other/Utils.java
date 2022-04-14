@@ -129,7 +129,7 @@ public class Utils {
 		}
 
 	}
-	
+
 	public static String getDayFromDate(java.sql.Date dateCarried) {
 
 		java.util.GregorianCalendar cal = new java.util.GregorianCalendar();
@@ -320,7 +320,7 @@ public class Utils {
 	public static String readFile(String pathToFile) throws IOException {
 		return new String(Files.readAllBytes(new File(pathToFile).toPath()));
 	}
-	
+
 	public static void zipDirectory(String sourceDirectoryPath, String zipPath) throws IOException {
 		Path zipFilePath = Files.createFile(Paths.get(zipPath));
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zipFilePath))) {
