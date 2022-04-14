@@ -61,13 +61,13 @@ public class Utils {
 		}
 	}
 
-	public static void copyFile(String sourceFile, String targetFile) throws IOException {
-		Files.copy(new File(sourceFile).toPath(), new File(targetFile).toPath());
-	}
-
 	public static void deleteFile(String pathToFile) throws IOException {
 		Path filePath = Paths.get(pathToFile);
 		Files.delete(filePath);
+	}
+
+	public static void copyFile(String sourceFile, String targetFile) throws IOException {
+		Files.copy(new File(sourceFile).toPath(), new File(targetFile).toPath());
 	}
 
 	public static Connection getAccessConnection(String accessDbPath) throws ClassNotFoundException, SQLException {
@@ -129,7 +129,7 @@ public class Utils {
 		}
 
 	}
-	
+
 	public static String getDayFromDate(java.sql.Date dateCarried) {
 
 		java.util.GregorianCalendar cal = new java.util.GregorianCalendar();
@@ -320,7 +320,7 @@ public class Utils {
 	public static String readFile(String pathToFile) throws IOException {
 		return new String(Files.readAllBytes(new File(pathToFile).toPath()));
 	}
-	
+
 	public static void zipDirectory(String sourceDirectoryPath, String zipPath) throws IOException {
 		Path zipFilePath = Files.createFile(Paths.get(zipPath));
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zipFilePath))) {
