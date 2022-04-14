@@ -21,18 +21,45 @@ import com.codef.gunfunmvc.repos.RegistryRepo;
 import com.codef.gunfunmvc.repos.ShootingSessionRepo;
 
 public class UtilsBuildConvert {
-	
-	
+
 	/*
 	 * 
-
-			// This is really only used to converting over data from old schema
-			UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
-			UtilsBuildConvert.convertOldData(conn, connSlave, gunRegistryRepo, gunCarrySessionsRepo,
-					gunCleaningSessionsRepo, gunShootingSessionsRepo);
-
+	 * 
+	 * // This is really only used to converting over data from old schema
+	 * UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
+	 * UtilsBuildConvert.convertOldData(conn, connSlave, gunRegistryRepo,
+	 * gunCarrySessionsRepo, gunCleaningSessionsRepo, gunShootingSessionsRepo);
+	 * 
 	 * 
 	 */
+
+	public static void addTriDates(Connection connMaster) throws SQLException {
+
+		String getLastSql = "SELECT NICKNAME, MAX(DATE_CARRIED) AS MAX_VALUE FROM CARRY_SESSIONS WHERE NICKNAME != '' GROUP BY NICKNAME";
+		Statement statement = connMaster.createStatement();
+		ResultSet resultset = statement.executeQuery(getLastSql);
+		while (resultset.next()) {
+			connMaster.createStatement().execute("UPDATE REGISTRY SET last_carried_date = '" + resultset.getDate("MAX_VALUE")
+					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
+		}
+
+		getLastSql = "SELECT NICKNAME, MAX(DATE_CLEANED) AS MAX_VALUE FROM CLEANING_SESSIONS WHERE NICKNAME != '' GROUP BY NICKNAME";
+		statement = connMaster.createStatement();
+		resultset = statement.executeQuery(getLastSql);
+		while (resultset.next()) {
+			connMaster.createStatement().execute("UPDATE REGISTRY SET last_cleaned_date = '" + resultset.getDate("MAX_VALUE")
+					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
+		}
+
+		getLastSql = "SELECT NICKNAME, MAX(DATE_FIRED) AS MAX_VALUE FROM SHOOTING_SESSIONS WHERE NICKNAME != '' GROUP BY NICKNAME";
+		statement = connMaster.createStatement();
+		resultset = statement.executeQuery(getLastSql);
+		while (resultset.next()) {
+			connMaster.createStatement().execute("UPDATE REGISTRY SET last_fired_date = '" + resultset.getDate("MAX_VALUE")
+					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
+		}
+
+	}
 
 	public static void convertOldData(Connection connMaster, Connection connSlave, RegistryRepo gunRegistryRepo,
 			CarrySessionRepo gunCarrySessionsRepo, CleaningSessionRepo gunCleaningSessionsRepo,
@@ -115,9 +142,9 @@ public class UtilsBuildConvert {
 		makeFolderWithAssets(pathToSampleResources, pathToAppFolder, "\\_manuals\\");
 
 	}
-	
+
 	public static void checkBackupScriptBuilt(String pathToSampleResources, String pathToAppFolder) throws IOException {
-		
+
 		String backupScript = "\\_data\\BackupH2Data.bat";
 		String sourceScriptPath = pathToSampleResources + backupScript;
 		String targetScriptPath = pathToAppFolder + backupScript;
@@ -125,7 +152,7 @@ public class UtilsBuildConvert {
 		if (!oDirectory.exists()) {
 			Utils.copyFile(sourceScriptPath, targetScriptPath);
 		}
-		
+
 	}
 
 	public static void makeFolderWithAssets(String pathToSampleResources, String pathToAppFolder, String resourceFolder)
