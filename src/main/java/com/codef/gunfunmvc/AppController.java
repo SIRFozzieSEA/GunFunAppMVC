@@ -1141,7 +1141,10 @@ public class AppController {
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " DATA TAB";
 
-			Utils.deleteFile(backupFolderLocation);
+			File oDirectory = new File(backupFolderLocation);
+			if (!oDirectory.exists()) {
+				oDirectory.mkdirs();
+			}
 
 			ArrayList<String> tableList = new ArrayList<>(
 					Arrays.asList("carry_sessions", "cleaning_reports", "cleaning_sessions", "registry", "roles",
