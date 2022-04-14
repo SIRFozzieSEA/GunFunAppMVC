@@ -32,9 +32,9 @@
 								<input tabindex="1" th:field="*{nickname}" class="field-label-input" type="text" autocomplete="off" /></td>
 								<td valign="top" rowspan="9">&nbsp;</td>
 								<td class="auto-style2" colspan="5" rowspan="9" valign="bottom">
+									<input tabindex="50" style="margin-top: 19px" type="file" name="gunPhoto" accept="image/jpeg" autocomplete="off" /><BR>
 									<a th:href="'/getImage?imageName=/large/' + ${gunRegistry.getNickname()} + '.jpg'" target="_blank">
 									<img border="2" alt="" th:src="'/getImage?imageName=/medium/' + ${gunRegistry.getNickname()} + '.jpg'" /></a>
-									<br class="auto-style1" /><input tabindex="10" style="margin-top: 10px" type="file" name="gunPhoto" accept="image/jpeg" autocomplete="off" />
 								</td>
 							</tr>
 							
@@ -48,46 +48,56 @@
 								<input tabindex="3" th:field="*{model}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
-							<tr>
-								<td valign="top"><span class="field-label">Serial No:<br />
-								<input tabindex="4" th:field="*{serial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
-							</tr>
+
 							
 							<tr>
 								<td valign="top"><span class="field-label">Caliber:<br />
-								<input tabindex="5" th:field="*{caliber}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="4" th:field="*{caliber}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
 							<tr>
 								<td valign="top"><span class="field-label">Barrel:<br />
-								<input tabindex="6" th:field="*{barrelLength}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="5" th:field="*{barrelLength}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
 							<tr>
 								<td valign="top"><span class="field-label">Frame Material:<br />
-								<input tabindex="7" th:field="*{frameMaterial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="6" th:field="*{frameMaterial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 					
 							<tr>
 								<td valign="top"><span class="field-label">Purchase Date:<br />
-								<input tabindex="8" th:field="*{purchaseDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="7" th:field="*{purchaseDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
 							<tr>
 								<td valign="top"><span class="field-label">Purchase Price:<br />
-								<input tabindex="9" th:field="*{purchaseCost}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="8" th:field="*{purchaseCost}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
 							<tr>
-								<td valign="top"></td>
-								<td valign="top">&nbsp;</td>
-								<td valign="top"><span class="field-label">Sighted Date:<br />
-											<input tabindex="11" th:field="*{sightedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
-								<td valign="top"></td>
-								<td valign="top" colspan="3"><font size="2">For 'Sighted Date' anything with an N/A means the sights<BR>will not move. 
-								Anything with a date and a "C" in the field<BR>means it's pretty much complete. Anything else is TBD.</font></td>
+								<td valign="top"><span class="field-label-gray">Last Fired Date:<br />
+								<input tabindex="9" readonly="true" th:field="*{lastFiredDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
+							<tr>
+								<td valign="top"><span class="field-label-gray">Last Cleaned Date:<br />
+								<input tabindex="10" readonly="true" th:field="*{lastCleanedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<td valign="top">&nbsp;</td>
+								<td valign="top"><span class="field-label">Last Sighted Date:<br />
+									<input tabindex="12" readonly="true" th:field="*{sightedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<td valign="top" rowspan="2" colspan="4"><span class="field-label">Notes:<br />
+									<textarea tabindex="14" style="margin-top: 2pt; height: 52pt" th:field="*{notes}" rows="4" cols="46"></textarea></td>
+							</tr>
+							
+							<tr>
+								<td valign="top"><span class="field-label-gray">Last Carried Date:<br />
+								<input tabindex="11" readonly="true" th:field="*{lastCarriedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<td valign="top">&nbsp;</td>
+								<td valign="top"><span class="field-label">Serial Number:<br />
+									<input tabindex="13" th:field="*{serial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+							</tr>
+
 						</table>
 					</div>
 

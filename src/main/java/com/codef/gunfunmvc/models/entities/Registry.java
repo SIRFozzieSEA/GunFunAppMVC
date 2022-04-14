@@ -72,5 +72,17 @@ public class Registry {
 	
 	@Column(name = "gun_is_dirty")
 	private Boolean gunIsDirty;
+	
+	@Column(name = "last_fired_date", length = 20)
+	private String lastFiredDate;
+	
+	@Column(name = "last_cleaned_date", length = 20)
+	private String lastCleanedDate;
+	
+	@Column(name = "last_carried_date", length = 20)
+	private String lastCarriedDate;
+	
+	@Column(name = "notes", length = 200)
+	private String notes;
 
 }
