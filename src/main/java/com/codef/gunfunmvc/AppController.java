@@ -1002,10 +1002,14 @@ public class AppController {
 		if (fileName.equals("")) {
 			Utils.copyFile(getGunFunAppPhotoLocation() + "\\_NEW.jpg",
 					getGunFunAppPhotoLocation() + "large\\" + gunRegistry.getNickname() + ".jpg");
-			Utils.copyFile(getGunFunAppPhotoLocation() + "\\_NEW.jpg",
-					getGunFunAppPhotoLocation() + "medium\\" + gunRegistry.getNickname() + ".jpg");
-			Utils.copyFile(getGunFunAppPhotoLocation() + "\\_NEW.jpg",
-					getGunFunAppPhotoLocation() + "small\\" + gunRegistry.getNickname() + ".jpg");
+			
+			BufferedImage imageIn = ImageIO
+					.read(new File(getGunFunAppPhotoLocation() + "large\\" + gunRegistry.getNickname() + ".jpg"));
+			ImageIO.write(Utils.resizeImage(imageIn, 550, 412), "jpeg",
+					new File(getGunFunAppPhotoLocation() + "medium\\" + gunRegistry.getNickname() + ".jpg"));
+			ImageIO.write(Utils.resizeImage(imageIn, 350, 260), "jpeg",
+					new File(getGunFunAppPhotoLocation() + "small\\" + gunRegistry.getNickname() + ".jpg"));
+			
 		} else {
 			Utils.saveFile(getGunFunAppPhotoLocation() + "large\\", gunRegistry.getNickname() + ".jpg", multipartFile);
 
