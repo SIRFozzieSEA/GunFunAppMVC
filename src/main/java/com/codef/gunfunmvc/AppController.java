@@ -367,7 +367,7 @@ public class AppController {
 	}
 
 	@PostMapping("/log/shot")
-	public String logShotDelete(HttpServletRequest request, Model model) {
+	public String logShotDelete(HttpServletRequest request, Model model) throws NumberFormatException, SQLException {
 
 		boolean editPerformed = false;
 		Map<String, String[]> requestParameterMap = request.getParameterMap();
@@ -399,7 +399,8 @@ public class AppController {
 		}
 
 		boolean deletesPerformed = false;
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			requestParameterMap = request.getParameterMap();
 			for (Object key : requestParameterMap.keySet()) {
@@ -419,6 +420,8 @@ public class AppController {
 		if (deletesPerformed) {
 			model.addAttribute("MESSAGE_TWO", "Entries removed from shot log.");
 		}
+		
+		conn.close();
 
 		return "frame_main";
 	}
@@ -498,7 +501,7 @@ public class AppController {
 	public String logCarryDelete(HttpServletRequest request, Model model) throws SQLException {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			Map<String, String[]> requestParameterMap = request.getParameterMap();
 			for (Object key : requestParameterMap.keySet()) {
@@ -623,9 +626,10 @@ public class AppController {
 	}
 
 	@PostMapping("/log/cleaning")
-	public String logCleaningDelete(HttpServletRequest request, Model model) {
+	public String logCleaningDelete(HttpServletRequest request, Model model) throws NumberFormatException, SQLException {
 
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			Map<String, String[]> requestParameterMap = request.getParameterMap();
 			for (Object key : requestParameterMap.keySet()) {
@@ -639,6 +643,7 @@ public class AppController {
 			model.addAttribute("MESSAGE", "Entries removed from cleaning log.");
 
 		}
+		conn.close();
 		return "frame_main";
 	}
 
@@ -884,7 +889,7 @@ public class AppController {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			long gunPkToDelete = gunRegistry.getGunPk();
 			String nickname = gunRegistry.getNickname();
@@ -1002,14 +1007,14 @@ public class AppController {
 		if (fileName.equals("")) {
 			Utils.copyFile(getGunFunAppPhotoLocation() + "\\_NEW.jpg",
 					getGunFunAppPhotoLocation() + "large\\" + gunRegistry.getNickname() + ".jpg");
-			
+
 			BufferedImage imageIn = ImageIO
 					.read(new File(getGunFunAppPhotoLocation() + "large\\" + gunRegistry.getNickname() + ".jpg"));
 			ImageIO.write(Utils.resizeImage(imageIn, 550, 412), "jpeg",
 					new File(getGunFunAppPhotoLocation() + "medium\\" + gunRegistry.getNickname() + ".jpg"));
 			ImageIO.write(Utils.resizeImage(imageIn, 350, 260), "jpeg",
 					new File(getGunFunAppPhotoLocation() + "small\\" + gunRegistry.getNickname() + ".jpg"));
-			
+
 		} else {
 			Utils.saveFile(getGunFunAppPhotoLocation() + "large\\", gunRegistry.getNickname() + ".jpg", multipartFile);
 
@@ -1688,8 +1693,8 @@ public class AppController {
 		return Boolean.valueOf(env.getProperty("BUILD_SAMPLE_ASSETS"));
 	}
 
-	public String getDeleteMasterPassword() {
-		return env.getProperty("DELETE_MASTER_PASSWORD");
+	public String getDeleteMasterPassword(Connection conn) throws SQLException {
+		return getPreferenceStringValue(conn, "DELETE_MASTER_PASSWORD");
 	}
 
 	public String getGunFunAppLocation() {
