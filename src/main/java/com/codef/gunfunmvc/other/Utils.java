@@ -15,7 +15,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -77,8 +76,7 @@ public class Utils {
 	}
 
 	public static long getRowsCountInDataTable(Connection conn, String tablename) throws SQLException {
-		Statement statement = conn.createStatement();
-		ResultSet result = statement.executeQuery("SELECT COUNT(*) FROM " + tablename);
+		ResultSet result = conn.createStatement().executeQuery("SELECT COUNT(*) FROM " + tablename);
 		result.next();
 		return result.getLong(1);
 	}
@@ -87,13 +85,16 @@ public class Utils {
 		conn.createStatement().execute(sql);
 	}
 
-	public static StringBuffer exportSQLAsTabDelimitedDataFile(Connection Conn, String sql, String exportFilePath,
+	public static ResultSet querySQL(Connection conn, String sql) throws SQLException {
+		return conn.createStatement().executeQuery(sql);
+	}
+
+	public static StringBuffer exportSQLAsTabDelimitedDataFile(Connection conn, String sql, String exportFilePath,
 			boolean writeHeader) throws SQLException, IOException {
 
 		StringBuffer oExportFileStringbuffer = new StringBuffer();
 
-		Statement statement = Conn.createStatement();
-		ResultSet resultset = statement.executeQuery(sql);
+		ResultSet resultset = conn.createStatement().executeQuery(sql);
 		ResultSetMetaData oRsmd = resultset.getMetaData();
 
 		if (writeHeader) {
@@ -155,11 +156,10 @@ public class Utils {
 		return "";
 	}
 
-	public static TreeSet<String> makeFirstSQLColumnTreeSet(Connection Conn, String sql)
+	public static TreeSet<String> makeFirstSQLColumnTreeSet(Connection conn, String sql)
 			throws SQLException, IOException {
 		TreeSet<String> returnSet = new TreeSet<String>();
-		Statement statement = Conn.createStatement();
-		ResultSet resultset = statement.executeQuery(sql);
+		ResultSet resultset = conn.createStatement().executeQuery(sql);
 
 		while (resultset.next()) {
 			returnSet.add(resultset.getString("DISPLAY_VALUE"));
@@ -167,7 +167,7 @@ public class Utils {
 		return returnSet;
 	}
 
-	public static ArrayList<HashMap<String, String>> makeSQLAsArrayListHashMap(Connection Conn, String sql,
+	public static ArrayList<HashMap<String, String>> makeSQLAsArrayListHashMap(Connection conn, String sql,
 			String dateColumnForBlankRow, String dayColumnForBlankRow, String dayToTriggerBlank,
 			String roundColumnForTotal) throws SQLException, IOException {
 
@@ -178,8 +178,7 @@ public class Utils {
 		ArrayList<String> columnList = new ArrayList<String>();
 		ArrayList<HashMap<String, String>> returnList = new ArrayList<HashMap<String, String>>();
 
-		Statement statement = Conn.createStatement();
-		ResultSet resultset = statement.executeQuery(sql);
+		ResultSet resultset = conn.createStatement().executeQuery(sql);
 		ResultSetMetaData oRsmd = resultset.getMetaData();
 
 		for (int i = 0; i < oRsmd.getColumnCount(); i++) {
@@ -257,15 +256,14 @@ public class Utils {
 
 	}
 
-	public static StringBuffer makeSQLAsTabTable(Connection Conn, String sql, boolean writeHeader)
+	public static StringBuffer makeSQLAsTabTable(Connection conn, String sql, boolean writeHeader)
 			throws SQLException, IOException {
 
 		StringBuffer oExportFileStringbuffer = new StringBuffer();
 
 		oExportFileStringbuffer.append("<table>");
 
-		Statement statement = Conn.createStatement();
-		ResultSet resultset = statement.executeQuery(sql);
+		ResultSet resultset = conn.createStatement().executeQuery(sql);
 		ResultSetMetaData oRsmd = resultset.getMetaData();
 
 		oExportFileStringbuffer.append("<tr>");
@@ -294,9 +292,8 @@ public class Utils {
 
 	}
 
-	public static String getStringValueFromTable(Connection Conn, String sql, String keyName) throws SQLException {
-		Statement statement = Conn.createStatement();
-		ResultSet resultset = statement.executeQuery(sql);
+	public static String getStringValueFromTable(Connection conn, String sql, String keyName) throws SQLException {
+		ResultSet resultset = conn.createStatement().executeQuery(sql);
 		if (resultset.next()) {
 			return resultset.getString(keyName);
 		} else {

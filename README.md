@@ -41,6 +41,5 @@ To get the project running for the first time (build tables, app folders, sample
 
 ### 'To Do' List
 - A way to customize template questions
-- Sorting on some pages
 - Manage preference page
 - Fix backup independence (generate SQL create files?)

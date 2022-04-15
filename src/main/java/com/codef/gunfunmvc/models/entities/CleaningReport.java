@@ -39,6 +39,9 @@ public class CleaningReport {
 	private long noOfRounds;
 
 	@Column(name = "date_fired")
-	private java.sql.Date dateCleaned;
+	private java.sql.Date dateFired;
+	
+	@Column(name = "date_last_cleaned")
+	private java.sql.Date dateLastCleaned;
 
 }
