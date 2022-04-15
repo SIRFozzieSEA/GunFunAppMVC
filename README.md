@@ -14,7 +14,6 @@ To get the project running for the first time (build tables, app folders, sample
 
 - Open the `application.properties` file in the IDE.
 - Edit the key `GUNFUN_APP_FOLDER` and set it to the path you'd like your application assets (data, images, pdfs, backups) to go into.
-- Edit the key `DELETE_MASTER_PASSWORD` and set it to whatever password you want to use as your delete confirm password.
 - Edit the key `server.port` and set it to whatever port you'd like the service to run on.
 - Edit the key `spring.datasource.password` and set it to whatever password you want to secure your database with.
 - Edit the key `spring.jpa.hibernate.ddl-auto` and set it to `create`. 
@@ -42,7 +41,5 @@ To get the project running for the first time (build tables, app folders, sample
 
 ### 'To Do' List
 - A way to customize template questions
-- Sorting on some pages
 - Manage preference page
 - Fix backup independence (generate SQL create files?)
-- delete password change

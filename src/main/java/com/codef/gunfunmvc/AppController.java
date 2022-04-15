@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -108,7 +107,6 @@ public class AppController {
 			if (getBuildSampleAssets()) {
 				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
 			}
-			processCleaningReport(conn);
 			conn.close();
 
 		} catch (SQLException e) {
@@ -253,12 +251,14 @@ public class AppController {
 	 */
 
 	@GetMapping("/report/shot")
-	public String reportShot(Model model) throws SQLException, IOException {
+	public String reportShot(HttpServletRequest request, Model model) throws SQLException, IOException {
 
+		String orderBy = request.getParameter("orderBy") != null ? request.getParameter("orderBy")
+				: "NICKNAME, CALIBER";
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Shot Report");
 		String sql = "SELECT NICKNAME, CALIBER, MAX(DATE_FIRED) AS LAST_DATE_FIRED, sum(NO_OF_ROUNDS) AS TOTAL_ROUNDS_FIRED "
-				+ "FROM shooting_sessions group by NICKNAME, CALIBER order by NICKNAME, CALIBER";
+				+ "FROM shooting_sessions group by NICKNAME, CALIBER order by " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 		sql = "SELECT SUM(NO_OF_ROUNDS) AS REPORT_TOTAL FROM shooting_sessions";
 		model.addAttribute("reportTotal", Utils.getStringValueFromTable(conn, sql, "REPORT_TOTAL"));
@@ -268,12 +268,13 @@ public class AppController {
 	}
 
 	@GetMapping("/report/shotbycaliber")
-	public String reportShotByCaliber(Model model) throws SQLException, IOException {
+	public String reportShotByCaliber(HttpServletRequest request, Model model) throws SQLException, IOException {
 
+		String orderBy = request.getParameter("orderBy") != null ? request.getParameter("orderBy") : "CALIBER";
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Shot Report by Caliber");
 		String sql = "SELECT CALIBER, SUM(NO_OF_ROUNDS) AS TOTAL_ROUNDS_FIRED FROM shooting_sessions "
-				+ "GROUP BY CALIBER ORDER BY CALIBER;";
+				+ "GROUP BY CALIBER ORDER BY " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 		sql = "SELECT SUM(NO_OF_ROUNDS) AS REPORT_TOTAL FROM shooting_sessions";
 		model.addAttribute("reportTotal", Utils.getStringValueFromTable(conn, sql, "REPORT_TOTAL"));
@@ -284,15 +285,16 @@ public class AppController {
 	}
 
 	@GetMapping("/report/carry")
-	public String reportCarry(Model model) throws SQLException, IOException {
+	public String reportCarry(HttpServletRequest request, Model model) throws SQLException, IOException {
 
+		String orderBy = request.getParameter("orderBy") != null ? request.getParameter("orderBy")
+				: "TOTAL_TIMES_CARRIED DESC";
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
 		model.addAttribute("reportTitle", "Carry Report");
 		String sql = "SELECT carry_sessions.NICKNAME, CALIBER, COUNT(*) AS TOTAL_TIMES_CARRIED, MAX(DATE_CARRIED) "
 				+ "AS LAST_DATE_CARRIED FROM carry_sessions INNER JOIN registry ON registry.NICKNAME = "
-				+ "carry_sessions.NICKNAME GROUP BY  carry_sessions.NICKNAME, CALIBER ORDER BY "
-				+ "TOTAL_TIMES_CARRIED DESC;";
+				+ "carry_sessions.NICKNAME GROUP BY  carry_sessions.NICKNAME, CALIBER ORDER BY " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 		sql = "SELECT SUM(NO_OF_ROUNDS) AS REPORT_TOTAL FROM cleaning_reports";
 		model.addAttribute("reportTotal", Utils.getStringValueFromTable(conn, sql, "REPORT_TOTAL"));
@@ -303,13 +305,17 @@ public class AppController {
 	}
 
 	@GetMapping("/report/cleaning")
-	public String reportCleaning(Model model) throws SQLException, IOException {
-
+	public String reportCleaning(HttpServletRequest request, Model model) throws SQLException, IOException {
+		
+		String orderBy = request.getParameter("orderBy") != null ? request.getParameter("orderBy") : "NICKNAME";
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+		
+		processCleaningReport(conn, null);
 
 		model.addAttribute("reportTitle", "Cleaning Report");
-		String sql = "SELECT NICKNAME, CALIBER, SUM(NO_OF_ROUNDS) as TOTAL_ROUNDS_FIRED, MAX(DATE_FIRED) AS LAST_DATE_FIRED "
-				+ "FROM cleaning_reports WHERE CALIBER != '' group by NICKNAME, CALIBER order by NICKNAME ;";
+		String sql = "SELECT NICKNAME, CALIBER, SUM(NO_OF_ROUNDS) as TOTAL_ROUNDS_FIRED, MAX(DATE_FIRED) AS LAST_DATE_FIRED,  "
+				+ "MAX(DATE_LAST_CLEANED) AS DATE_LAST_CLEANED FROM cleaning_reports WHERE CALIBER != '' group by NICKNAME, "
+				+ "CALIBER order by " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 
 		conn.close();
@@ -351,11 +357,12 @@ public class AppController {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Shot Log");
-		String whereClause = "WHERE DATE_FIRED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_SHOT")
-				+ ", CURRENT_DATE)";
-		if (request.getParameter("show") != null) {
-			whereClause = "";
-		}
+
+		String whereClause = request.getParameter("show") == null
+				? "WHERE DATE_FIRED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_SHOT")
+						+ ", CURRENT_DATE)"
+				: "";
+
 		String sql = "SELECT SHOOT_PK, NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED FROM shooting_sessions "
 				+ whereClause + " ORDER by DATE_FIRED DESC, NICKNAME";
 		model.addAttribute("report",
@@ -367,7 +374,7 @@ public class AppController {
 	}
 
 	@PostMapping("/log/shot")
-	public String logShotDelete(HttpServletRequest request, Model model) {
+	public String logShotDelete(HttpServletRequest request, Model model) throws NumberFormatException, SQLException {
 
 		boolean editPerformed = false;
 		Map<String, String[]> requestParameterMap = request.getParameterMap();
@@ -399,7 +406,8 @@ public class AppController {
 		}
 
 		boolean deletesPerformed = false;
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			requestParameterMap = request.getParameterMap();
 			for (Object key : requestParameterMap.keySet()) {
@@ -419,6 +427,8 @@ public class AppController {
 		if (deletesPerformed) {
 			model.addAttribute("MESSAGE_TWO", "Entries removed from shot log.");
 		}
+
+		conn.close();
 
 		return "frame_main";
 	}
@@ -480,11 +490,12 @@ public class AppController {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Carry Log");
-		String whereClause = "WHERE DATE_CARRIED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_CARRY")
-				+ ", CURRENT_DATE)";
-		if (request.getParameter("show") != null) {
-			whereClause = "";
-		}
+
+		String whereClause = request.getParameter("show") == null
+				? "WHERE DATE_CARRIED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_CARRY")
+						+ ", CURRENT_DATE)"
+				: "";
+
 		String sql = "SELECT CARRY_PK, NICKNAME, DATE_CARRIED, DAY_OF_WEEK FROM carry_sessions " + whereClause
 				+ " ORDER by DATE_CARRIED DESC, NICKNAME";
 		model.addAttribute("report",
@@ -498,7 +509,7 @@ public class AppController {
 	public String logCarryDelete(HttpServletRequest request, Model model) throws SQLException {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			Map<String, String[]> requestParameterMap = request.getParameterMap();
 			for (Object key : requestParameterMap.keySet()) {
@@ -609,11 +620,12 @@ public class AppController {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 		model.addAttribute("reportTitle", "Cleaning Log");
-		String whereClause = "WHERE DATE_CLEANED > DATEADD('DAY', "
-				+ getPreferenceLongValue(conn, "MAX_LOG_DAYS_CLEANING") + ", CURRENT_DATE)";
-		if (request.getParameter("show") != null) {
-			whereClause = "";
-		}
+
+		String whereClause = request.getParameter("show") == null
+				? "WHERE DATE_CLEANED > DATEADD('DAY', " + getPreferenceLongValue(conn, "MAX_LOG_DAYS_CLEANING")
+						+ ", CURRENT_DATE)"
+				: "";
+
 		String sql = "SELECT CLEAN_PK, NICKNAME, DATE_CLEANED FROM cleaning_sessions " + whereClause
 				+ " ORDER by DATE_CLEANED DESC, NICKNAME";
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, "DATE_CLEANED", null, null, null));
@@ -623,9 +635,11 @@ public class AppController {
 	}
 
 	@PostMapping("/log/cleaning")
-	public String logCleaningDelete(HttpServletRequest request, Model model) {
+	public String logCleaningDelete(HttpServletRequest request, Model model)
+			throws NumberFormatException, SQLException {
 
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			Map<String, String[]> requestParameterMap = request.getParameterMap();
 			for (Object key : requestParameterMap.keySet()) {
@@ -639,6 +653,7 @@ public class AppController {
 			model.addAttribute("MESSAGE", "Entries removed from cleaning log.");
 
 		}
+		conn.close();
 		return "frame_main";
 	}
 
@@ -689,7 +704,6 @@ public class AppController {
 
 		model.addAttribute("MESSAGE", "Entries added to cleaning log.");
 
-		processCleaningReport(conn);
 		conn.close();
 
 		return "frame_main";
@@ -884,7 +898,7 @@ public class AppController {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
-		if (request.getParameter("password").equals(getDeleteMasterPassword())) {
+		if (request.getParameter("password").equals(getDeleteMasterPassword(conn))) {
 
 			long gunPkToDelete = gunRegistry.getGunPk();
 			String nickname = gunRegistry.getNickname();
@@ -1002,14 +1016,14 @@ public class AppController {
 		if (fileName.equals("")) {
 			Utils.copyFile(getGunFunAppPhotoLocation() + "\\_NEW.jpg",
 					getGunFunAppPhotoLocation() + "large\\" + gunRegistry.getNickname() + ".jpg");
-			
+
 			BufferedImage imageIn = ImageIO
 					.read(new File(getGunFunAppPhotoLocation() + "large\\" + gunRegistry.getNickname() + ".jpg"));
 			ImageIO.write(Utils.resizeImage(imageIn, 550, 412), "jpeg",
 					new File(getGunFunAppPhotoLocation() + "medium\\" + gunRegistry.getNickname() + ".jpg"));
 			ImageIO.write(Utils.resizeImage(imageIn, 350, 260), "jpeg",
 					new File(getGunFunAppPhotoLocation() + "small\\" + gunRegistry.getNickname() + ".jpg"));
-			
+
 		} else {
 			Utils.saveFile(getGunFunAppPhotoLocation() + "large\\", gunRegistry.getNickname() + ".jpg", multipartFile);
 
@@ -1443,26 +1457,65 @@ public class AppController {
 
 	}
 
-	private void processCleaningReport(Connection conn) throws SQLException {
+	private void processCleaningReport(Connection conn, String nickname) throws SQLException {
 
-		jdbcTemplateOne.execute("TRUNCATE TABLE cleaning_reports");
-
-		String sql = "SELECT NICKNAME, MAX(date_cleaned) as last_date_cleaned FROM cleaning_sessions group by NICKNAME order by NICKNAME";
-		Statement statement = conn.createStatement();
-		ResultSet result = statement.executeQuery(sql);
-
-		while (result.next()) {
-			String nickname = result.getString("NICKNAME");
-			Date lastCleanedDate = result.getDate("last_date_cleaned");
-			String sqlSelect = "SELECT NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED FROM shooting_sessions WHERE NICKNAME = '"
-					+ nickname + "' AND DATE_FIRED > '" + lastCleanedDate + "' ORDER BY DATE_FIRED";
-			String sqlTwo = "INSERT INTO cleaning_reports (NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED) " + sqlSelect;
-			jdbcTemplateOne.execute(sqlTwo);
+		String nickNameClause = "";
+		if (nickname == null) {
+			nickNameClause = "NICKNAME IS NOT NULL";
+			Utils.executeSQL(conn, "TRUNCATE TABLE cleaning_reports");
+		} else {
+			nickNameClause = "NICKNAME = '" + nickname + "'";
+			Utils.executeSQL(conn, "DELETE FROM cleaning_reports WHERE " + nickNameClause);
 		}
 
-		jdbcTemplateOne.execute("UPDATE registry SET gun_is_dirty = false");
-		jdbcTemplateOne.execute(
-				"UPDATE registry SET gun_is_dirty = true WHERE NICKNAME IN (SELECT NICKNAME FROM cleaning_reports)");
+		String getLastSql = "SELECT NICKNAME, MAX(DATE_CARRIED) AS MAX_VALUE FROM CARRY_SESSIONS WHERE "
+				+ nickNameClause + " GROUP BY NICKNAME";
+		ResultSet resultset = Utils.querySQL(conn, getLastSql);
+		while (resultset.next()) {
+			Utils.executeSQL(conn, "UPDATE REGISTRY SET last_carried_date = '" + resultset.getDate("MAX_VALUE")
+					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
+		}
+
+		getLastSql = "SELECT NICKNAME, MAX(DATE_CLEANED) AS MAX_VALUE FROM CLEANING_SESSIONS WHERE " + nickNameClause
+				+ " GROUP BY NICKNAME";
+		resultset = Utils.querySQL(conn, getLastSql);
+		while (resultset.next()) {
+			Utils.executeSQL(conn, "UPDATE REGISTRY SET last_cleaned_date = '" + resultset.getDate("MAX_VALUE")
+					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
+		}
+
+		getLastSql = "SELECT NICKNAME, MAX(DATE_FIRED) AS MAX_VALUE FROM SHOOTING_SESSIONS WHERE " + nickNameClause
+				+ " GROUP BY NICKNAME";
+		resultset = Utils.querySQL(conn, getLastSql);
+		while (resultset.next()) {
+			Utils.executeSQL(conn, "UPDATE REGISTRY SET last_fired_date = '" + resultset.getDate("MAX_VALUE")
+					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
+		}
+
+		String sql = "SELECT NICKNAME, MAX(date_cleaned) as last_date_cleaned FROM cleaning_sessions WHERE "
+				+ nickNameClause + " group by NICKNAME order by NICKNAME";
+		ResultSet result = Utils.querySQL(conn, sql);
+		while (result.next()) {
+			String nicknameProcess = result.getString("NICKNAME");
+			Date lastCleanedDate = result.getDate("last_date_cleaned");
+			String sqlSelect = "SELECT NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED FROM shooting_sessions WHERE NICKNAME = '"
+					+ nicknameProcess + "' AND DATE_FIRED > '" + lastCleanedDate + "' ORDER BY DATE_FIRED";
+			String sqlTwo = "INSERT INTO cleaning_reports (NICKNAME, CALIBER, NO_OF_ROUNDS, DATE_FIRED) " + sqlSelect;
+			Utils.executeSQL(conn, sqlTwo);
+		}
+
+		sql = "SELECT NICKNAME, LAST_CLEANED_DATE FROM REGISTRY WHERE " + nickNameClause + " ORDER BY NICKNAME";
+		result = Utils.querySQL(conn, sql);
+		while (result.next()) {
+			Utils.executeSQL(conn,
+					"UPDATE cleaning_reports SET date_last_cleaned = '" + result.getDate("LAST_CLEANED_DATE")
+							+ "' WHERE NICKNAME = '" + result.getString("NICKNAME") + "'");
+		}
+
+		Utils.executeSQL(conn, "UPDATE registry SET gun_is_dirty = false WHERE " + nickNameClause);
+		Utils.executeSQL(conn,
+				"UPDATE registry SET gun_is_dirty = true WHERE NICKNAME IN (SELECT NICKNAME FROM cleaning_reports WHERE "
+						+ nickNameClause + ")");
 
 	}
 
@@ -1492,31 +1545,31 @@ public class AppController {
 
 	private String rebuildQuestions() throws SQLException {
 
-		jdbcTemplateOne.execute("TRUNCATE TABLE trivia_question_templates");
+		// put custom questions
+		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+
+		Utils.executeSQL(conn, "TRUNCATE TABLE trivia_question_templates");
 		if (env.getProperty("spring.datasource.driverClassName").equals("com.mysql.cj.jdbc.Driver")) {
-			jdbcTemplateOne.execute("ALTER TABLE trivia_question_templates AUTO_INCREMENT = 1");
+			Utils.executeSQL(conn, "ALTER TABLE trivia_question_templates AUTO_INCREMENT = 1");
 
 		} else {
-			jdbcTemplateOne.execute("ALTER TABLE trivia_question_templates ALTER COLUMN TRIVIA_PK RESTART WITH 1");
+			Utils.executeSQL(conn, "ALTER TABLE trivia_question_templates ALTER COLUMN TRIVIA_PK RESTART WITH 1");
 		}
 
-		jdbcTemplateOne.execute("TRUNCATE TABLE trivia_rounds");
-		jdbcTemplateOne.execute("TRUNCATE TABLE trivia_round_questions");
+		Utils.executeSQL(conn, "TRUNCATE TABLE trivia_rounds");
+		Utils.executeSQL(conn, "TRUNCATE TABLE trivia_round_questions");
 
 		if (env.getProperty("spring.datasource.driverClassName").equals("com.mysql.cj.jdbc.Driver")) {
-			jdbcTemplateOne.execute("ALTER TABLE trivia_rounds AUTO_INCREMENT = 1");
-			jdbcTemplateOne.execute("ALTER TABLE trivia_round_questions AUTO_INCREMENT = 1");
+			Utils.executeSQL(conn, "ALTER TABLE trivia_rounds AUTO_INCREMENT = 1");
+			Utils.executeSQL(conn, "ALTER TABLE trivia_round_questions AUTO_INCREMENT = 1");
 		} else {
-			jdbcTemplateOne.execute("ALTER TABLE trivia_rounds ALTER COLUMN ROUND_PK RESTART WITH 1");
-			jdbcTemplateOne.execute("ALTER TABLE trivia_round_questions ALTER COLUMN QUESTION_PK RESTART WITH 1");
+			Utils.executeSQL(conn, "ALTER TABLE trivia_rounds ALTER COLUMN ROUND_PK RESTART WITH 1");
+			Utils.executeSQL(conn, "ALTER TABLE trivia_round_questions ALTER COLUMN QUESTION_PK RESTART WITH 1");
 		}
 
 		// put standard questions
 		List<Registry> gunRegistryEntries = (List<Registry>) gunRegistryRepo.findAll();
 		addStandardQuestionsForGuns(gunRegistryEntries);
-
-		// put custom questions
-		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
 		if (env.getProperty("spring.datasource.driverClassName").equals("com.mysql.cj.jdbc.Driver")) {
 			Utils.executeSQL(conn, "INSERT INTO trivia_question_templates "
@@ -1653,7 +1706,7 @@ public class AppController {
 				return false;
 			} else {
 				String sql = "DELETE FROM carry_sessions WHERE NICKNAME = '' AND date_carried = '" + dateCarried + "'";
-				conn.createStatement().execute(sql);
+				Utils.executeSQL(conn, sql);
 				return true;
 			}
 		}
@@ -1688,8 +1741,8 @@ public class AppController {
 		return Boolean.valueOf(env.getProperty("BUILD_SAMPLE_ASSETS"));
 	}
 
-	public String getDeleteMasterPassword() {
-		return env.getProperty("DELETE_MASTER_PASSWORD");
+	public String getDeleteMasterPassword(Connection conn) throws SQLException {
+		return getPreferenceStringValue(conn, "DELETE_MASTER_PASSWORD");
 	}
 
 	public String getGunFunAppLocation() {

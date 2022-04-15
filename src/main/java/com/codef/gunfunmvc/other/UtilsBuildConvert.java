@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -33,42 +32,13 @@ public class UtilsBuildConvert {
 	 * 
 	 */
 
-	public static void addTriDates(Connection connMaster) throws SQLException {
-
-		String getLastSql = "SELECT NICKNAME, MAX(DATE_CARRIED) AS MAX_VALUE FROM CARRY_SESSIONS WHERE NICKNAME != '' GROUP BY NICKNAME";
-		Statement statement = connMaster.createStatement();
-		ResultSet resultset = statement.executeQuery(getLastSql);
-		while (resultset.next()) {
-			connMaster.createStatement().execute("UPDATE REGISTRY SET last_carried_date = '" + resultset.getDate("MAX_VALUE")
-					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
-		}
-
-		getLastSql = "SELECT NICKNAME, MAX(DATE_CLEANED) AS MAX_VALUE FROM CLEANING_SESSIONS WHERE NICKNAME != '' GROUP BY NICKNAME";
-		statement = connMaster.createStatement();
-		resultset = statement.executeQuery(getLastSql);
-		while (resultset.next()) {
-			connMaster.createStatement().execute("UPDATE REGISTRY SET last_cleaned_date = '" + resultset.getDate("MAX_VALUE")
-					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
-		}
-
-		getLastSql = "SELECT NICKNAME, MAX(DATE_FIRED) AS MAX_VALUE FROM SHOOTING_SESSIONS WHERE NICKNAME != '' GROUP BY NICKNAME";
-		statement = connMaster.createStatement();
-		resultset = statement.executeQuery(getLastSql);
-		while (resultset.next()) {
-			connMaster.createStatement().execute("UPDATE REGISTRY SET last_fired_date = '" + resultset.getDate("MAX_VALUE")
-					+ "' WHERE NICKNAME = '" + resultset.getString("NICKNAME") + "'");
-		}
-
-	}
-
 	public static void convertOldData(Connection connMaster, Connection connSlave, RegistryRepo gunRegistryRepo,
 			CarrySessionRepo gunCarrySessionsRepo, CleaningSessionRepo gunCleaningSessionsRepo,
 			ShootingSessionRepo gunShootingSessionsRepo) throws SQLException {
 
 		// GUN_REGISTRY
-		connMaster.createStatement().execute("TRUNCATE TABLE REGISTRY ");
-		Statement statement = connSlave.createStatement();
-		ResultSet resultset = statement.executeQuery("SELECT * FROM GUN_REGISTRY ORDER BY PURCHASE_DATE");
+		Utils.executeSQL(connMaster, "TRUNCATE TABLE REGISTRY ");
+		ResultSet resultset = Utils.querySQL(connSlave, "SELECT * FROM GUN_REGISTRY ORDER BY PURCHASE_DATE");
 		while (resultset.next()) {
 			Registry newObj = new Registry();
 			newObj.setSerial(resultset.getString("SERIAL"));
@@ -89,9 +59,8 @@ public class UtilsBuildConvert {
 		}
 
 		// CARRY_SESSIONS
-		connMaster.createStatement().execute("TRUNCATE TABLE CARRY_SESSIONS  ");
-		statement = connSlave.createStatement();
-		resultset = statement.executeQuery("SELECT * FROM GUN_SESSIONS_CARRY ORDER BY DATE_CARRIED, CARRY_PK");
+		Utils.executeSQL(connMaster, "TRUNCATE TABLE CARRY_SESSIONS  ");
+		resultset = Utils.querySQL(connSlave, "SELECT * FROM GUN_SESSIONS_CARRY ORDER BY DATE_CARRIED, CARRY_PK");
 		while (resultset.next()) {
 			CarrySession newObj = new CarrySession();
 			newObj.setNickname(resultset.getString("GUN_NICKNAME"));
@@ -101,9 +70,8 @@ public class UtilsBuildConvert {
 		}
 
 		// CLEANING_SESSIONS
-		connMaster.createStatement().execute("TRUNCATE TABLE CLEANING_SESSIONS ");
-		statement = connSlave.createStatement();
-		resultset = statement.executeQuery("SELECT * FROM GUN_SESSIONS_CLEANING ORDER BY DATE_CLEANED");
+		Utils.executeSQL(connMaster, "TRUNCATE TABLE CLEANING_SESSIONS ");
+		resultset = Utils.querySQL(connSlave, "SELECT * FROM GUN_SESSIONS_CLEANING ORDER BY DATE_CLEANED");
 		while (resultset.next()) {
 			CleaningSession newObj = new CleaningSession();
 			newObj.setNickname(resultset.getString("GUN_NICKNAME"));
@@ -112,9 +80,8 @@ public class UtilsBuildConvert {
 		}
 
 		// SHOOTING_SESSIONS
-		connMaster.createStatement().execute("TRUNCATE TABLE SHOOTING_SESSIONS ");
-		statement = connSlave.createStatement();
-		resultset = statement.executeQuery("SELECT * FROM GUN_SESSIONS_SHOOTING");
+		Utils.executeSQL(connMaster, "TRUNCATE TABLE SHOOTING_SESSIONS ");
+		resultset = Utils.querySQL(connSlave, "SELECT * FROM GUN_SESSIONS_SHOOTING");
 		while (resultset.next()) {
 			ShootingSession newObj = new ShootingSession();
 			newObj.setNickname(resultset.getString("GUN_NICKNAME"));
@@ -125,7 +92,7 @@ public class UtilsBuildConvert {
 		}
 
 		// CLEANING_REPORTS
-		connMaster.createStatement().execute("TRUNCATE TABLE CLEANING_REPORTS ");
+		Utils.executeSQL(connSlave, "TRUNCATE TABLE CLEANING_REPORTS ");
 
 	}
 
