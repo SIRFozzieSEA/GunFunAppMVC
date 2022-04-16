@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +135,7 @@ public class AppController {
 		String crlfcm = ",\n";
 
 		StringBuffer dropBuffer = new StringBuffer();
+		StringBuffer trunacateBuffer = new StringBuffer();
 		StringBuffer createBuffer = new StringBuffer();
 		StringBuffer dataBuffer = new StringBuffer();
 		StringBuffer sequenceBuffer = new StringBuffer();
@@ -148,6 +150,7 @@ public class AppController {
 			long lastPk = 0;
 
 			dropBuffer.append("DROP TABLE IF EXISTS " + currentTableName + crlfcl);
+			trunacateBuffer.append("TRUNCATE TABLE " + currentTableName + crlfcl);
 			createBuffer.append("CREATE TABLE `" + currentTableName + "` (" + crlf);
 			ResultSet resultsettwo = Utils.querySQL(conn, "show columns from " + currentTableName);
 			while (resultsettwo.next()) {
@@ -165,8 +168,6 @@ public class AppController {
 					defaultValue = " default 'N'";
 				}
 
-				// escape quotes (single and otherwise)
-
 				createBuffer.append(
 						tabcl + "`" + fieldName + "` " + fieldType + (fieldDefault.equals("NULL") ? defaultValue : "")
 								+ (fieldNull.equals("NO") ? " NOT NULL " : "")
@@ -175,37 +176,52 @@ public class AppController {
 					pkColumn = fieldName;
 				}
 			}
+			
+			Collections.sort(columnNames);
+			
 			String oldCreateBuffer = createBuffer.toString();
 			createBuffer = new StringBuffer();
 			createBuffer
 					.append(oldCreateBuffer.substring(0, oldCreateBuffer.length() - 2) + crlf + ")" + crlfcl + crlf);
 
+			StringBuffer dataBufferTemp = new StringBuffer();
+			dataBufferTemp.append("INSERT INTO " + currentTableName + " ("
+					+ columnNames.toString().replaceAll("\\[", "").replaceAll("\\]", "") + ") @VALUES ");
+
+			boolean hasData = false;
 			resultsettwo = Utils.querySQL(conn, "select * from " + currentTableName + " order by " + pkColumn);
 			while (resultsettwo.next()) {
-				dataBuffer.append("INSERT INTO " + currentTableName + " ("
-						+ columnNames.toString().replaceAll("\\[", "").replaceAll("\\]", "") + ") VALUES (");
+				hasData = true;
+				dataBufferTemp.append(", " + crlf + tabcl + "(");
 				for (String singleColumn : columnNames) {
-					String singleColumnValue = resultsettwo.getString(singleColumn) == null ? "null, "
-							: "'" + resultsettwo.getString(singleColumn).replaceAll("'", "''") + "', ";
-					dataBuffer.append(singleColumnValue);
+					String singleColumnValue = resultsettwo.getString(singleColumn) != null
+							&& resultsettwo.getString(singleColumn).length() > 0
+									? "'" + resultsettwo.getString(singleColumn).replaceAll("'", "''") + "', "
+									: "null, ";
+					dataBufferTemp.append(singleColumnValue);
 				}
-				String oldDataBuffer = dataBuffer.toString();
-				dataBuffer = new StringBuffer();
-				dataBuffer.append(oldDataBuffer.substring(0, oldDataBuffer.length() - 2) + ")" + crlfcl);
+				String oldDataBuffer = dataBufferTemp.toString().replaceAll("@VALUES ,", "VALUES");
+				dataBufferTemp = new StringBuffer();
+				dataBufferTemp.append(oldDataBuffer.substring(0, oldDataBuffer.length() - 2) + ")");
 				lastPk = resultsettwo.getLong(pkColumn);
 			}
 			lastPk = lastPk + 1;
 
-			sequenceBuffer.append("ALTER TABLE " + currentTableName + " ALTER COLUMN " + pkColumn + " RESTART WITH "
-					+ lastPk + crlfcl);
+			if (!currentTableName.equals("ROLES")) {
+				sequenceBuffer.append("ALTER TABLE " + currentTableName + " ALTER COLUMN " + pkColumn + " RESTART WITH "
+						+ lastPk + crlfcl);
+			}
+
+			if (hasData) {
+				dataBuffer.append(dataBufferTemp);
+				dataBuffer.append(crlfcl + crlf);
+			}
 		}
 
 		System.out.println(dropBuffer);
-		System.out.println("");
+		System.out.println(trunacateBuffer);
 		System.out.println(createBuffer.toString().replaceAll("DATE_LAST_CLEANED", "LAST_CLEANED_DATE"));
-		System.out.println("");
 		System.out.println(dataBuffer.toString().replaceAll("DATE_LAST_CLEANED", "LAST_CLEANED_DATE"));
-		System.out.println("");
 		System.out.println(sequenceBuffer);
 
 	}
