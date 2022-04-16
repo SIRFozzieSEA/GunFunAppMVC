@@ -32,7 +32,7 @@ public class CleaningReport {
 	@Column(name = "nickname", length = 20)
 	private String nickname;
 
-	@Column(name = "caliber")
+	@Column(name = "caliber", length = 25)
 	private String caliber;
 
 	@Column(name = "no_of_rounds")
@@ -41,7 +41,7 @@ public class CleaningReport {
 	@Column(name = "date_fired")
 	private java.sql.Date dateFired;
 	
-	@Column(name = "date_last_cleaned")
-	private java.sql.Date dateLastCleaned;
+	@Column(name = "last_cleaned_date")
+	private java.sql.Date lastDateCleaned;
 
 }

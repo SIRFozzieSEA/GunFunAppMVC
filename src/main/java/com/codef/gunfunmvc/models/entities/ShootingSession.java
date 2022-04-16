@@ -32,7 +32,7 @@ public class ShootingSession {
 	@Column(name = "nickname", length = 20)
 	private String nickname;
 
-	@Column(name = "caliber")
+	@Column(name = "caliber", length = 25)
 	private String caliber;
 
 	@Column(name = "no_of_rounds")

@@ -82,10 +82,12 @@ public class Utils {
 	}
 
 	public static void executeSQL(Connection conn, String sql) throws SQLException {
+//		System.out.println("execute: " + sql);
 		conn.createStatement().execute(sql);
 	}
 
 	public static ResultSet querySQL(Connection conn, String sql) throws SQLException {
+//		System.out.println("  query: " + sql);
 		return conn.createStatement().executeQuery(sql);
 	}
 

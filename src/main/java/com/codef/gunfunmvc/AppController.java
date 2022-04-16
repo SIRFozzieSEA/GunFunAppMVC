@@ -98,6 +98,11 @@ public class AppController {
 	 * Main App Windows
 	 */
 
+	// DATE_LAST_CLEANED
+
+//	jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
+//	jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
+
 	@GetMapping("/")
 	public String indexLaunch(Model model) throws SQLException, IOException {
 
@@ -107,6 +112,9 @@ public class AppController {
 			if (getBuildSampleAssets()) {
 				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
 			}
+
+			doTableStuff(conn);
+
 			conn.close();
 
 		} catch (SQLException e) {
@@ -116,6 +124,90 @@ public class AppController {
 		}
 
 		return "index";
+	}
+
+	public static void doTableStuff(Connection conn) throws SQLException {
+
+		String tabcl = "\t";
+		String crlf = "\n";
+		String crlfcl = ";\n";
+		String crlfcm = ",\n";
+
+		StringBuffer dropBuffer = new StringBuffer();
+		StringBuffer createBuffer = new StringBuffer();
+		StringBuffer dataBuffer = new StringBuffer();
+		StringBuffer sequenceBuffer = new StringBuffer();
+
+		String sql = "SHOW TABLES";
+		ResultSet resultset = Utils.querySQL(conn, sql);
+		while (resultset.next()) {
+
+			String currentTableName = resultset.getString("TABLE_NAME");
+			ArrayList<String> columnNames = new ArrayList<String>();
+			String pkColumn = "";
+			long lastPk = 0;
+
+			dropBuffer.append("DROP TABLE IF EXISTS " + currentTableName + crlfcl);
+			createBuffer.append("CREATE TABLE `" + currentTableName + "` (" + crlf);
+			ResultSet resultsettwo = Utils.querySQL(conn, "show columns from " + currentTableName);
+			while (resultsettwo.next()) {
+				String fieldName = resultsettwo.getString("FIELD");
+				String fieldType = resultsettwo.getString("TYPE");
+				String fieldNull = resultsettwo.getString("NULL");
+				String fieldKey = resultsettwo.getString("KEY");
+				String fieldDefault = resultsettwo.getString("DEFAULT");
+				columnNames.add(fieldName);
+
+				String defaultValue = " default ''";
+				if (fieldType.startsWith("BIGINT")) {
+					defaultValue = " default '0'";
+				} else if (fieldType.startsWith("BOOLEAN")) {
+					defaultValue = " default 'N'";
+				}
+
+				// escape quotes (single and otherwise)
+
+				createBuffer.append(
+						tabcl + "`" + fieldName + "` " + fieldType + (fieldDefault.equals("NULL") ? defaultValue : "")
+								+ (fieldNull.equals("NO") ? " NOT NULL " : "")
+								+ (fieldKey.equals("PRI") ? "auto_increment PRIMARY KEY" : "") + crlfcm);
+				if (fieldKey.equals("PRI")) {
+					pkColumn = fieldName;
+				}
+			}
+			String oldCreateBuffer = createBuffer.toString();
+			createBuffer = new StringBuffer();
+			createBuffer
+					.append(oldCreateBuffer.substring(0, oldCreateBuffer.length() - 2) + crlf + ")" + crlfcl + crlf);
+
+			resultsettwo = Utils.querySQL(conn, "select * from " + currentTableName + " order by " + pkColumn);
+			while (resultsettwo.next()) {
+				dataBuffer.append("INSERT INTO " + currentTableName + " ("
+						+ columnNames.toString().replaceAll("\\[", "").replaceAll("\\]", "") + ") VALUES (");
+				for (String singleColumn : columnNames) {
+					String singleColumnValue = resultsettwo.getString(singleColumn) == null ? "null, "
+							: "'" + resultsettwo.getString(singleColumn).replaceAll("'", "''") + "', ";
+					dataBuffer.append(singleColumnValue);
+				}
+				String oldDataBuffer = dataBuffer.toString();
+				dataBuffer = new StringBuffer();
+				dataBuffer.append(oldDataBuffer.substring(0, oldDataBuffer.length() - 2) + ")" + crlfcl);
+				lastPk = resultsettwo.getLong(pkColumn);
+			}
+			lastPk = lastPk + 1;
+
+			sequenceBuffer.append("ALTER TABLE " + currentTableName + " ALTER COLUMN " + pkColumn + " RESTART WITH "
+					+ lastPk + crlfcl);
+		}
+
+		System.out.println(dropBuffer);
+		System.out.println("");
+		System.out.println(createBuffer.toString().replaceAll("DATE_LAST_CLEANED", "LAST_CLEANED_DATE"));
+		System.out.println("");
+		System.out.println(dataBuffer.toString().replaceAll("DATE_LAST_CLEANED", "LAST_CLEANED_DATE"));
+		System.out.println("");
+		System.out.println(sequenceBuffer);
+
 	}
 
 	@GetMapping("/frame_navigation")
@@ -306,15 +398,15 @@ public class AppController {
 
 	@GetMapping("/report/cleaning")
 	public String reportCleaning(HttpServletRequest request, Model model) throws SQLException, IOException {
-		
+
 		String orderBy = request.getParameter("orderBy") != null ? request.getParameter("orderBy") : "NICKNAME";
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
-		
+
 		processCleaningReport(conn, null);
 
 		model.addAttribute("reportTitle", "Cleaning Report");
 		String sql = "SELECT NICKNAME, CALIBER, SUM(NO_OF_ROUNDS) as TOTAL_ROUNDS_FIRED, MAX(DATE_FIRED) AS LAST_DATE_FIRED,  "
-				+ "MAX(DATE_LAST_CLEANED) AS DATE_LAST_CLEANED FROM cleaning_reports WHERE CALIBER != '' group by NICKNAME, "
+				+ "MAX(LAST_CLEANED_DATE) AS LAST_CLEANED_DATE FROM cleaning_reports WHERE CALIBER != '' group by NICKNAME, "
 				+ "CALIBER order by " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 
@@ -1508,7 +1600,7 @@ public class AppController {
 		result = Utils.querySQL(conn, sql);
 		while (result.next()) {
 			Utils.executeSQL(conn,
-					"UPDATE cleaning_reports SET date_last_cleaned = '" + result.getDate("LAST_CLEANED_DATE")
+					"UPDATE cleaning_reports SET LAST_CLEANED_DATE = '" + result.getDate("LAST_CLEANED_DATE")
 							+ "' WHERE NICKNAME = '" + result.getString("NICKNAME") + "'");
 		}
 
