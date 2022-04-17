@@ -99,7 +99,8 @@ public class AppController {
 	 * Main App Windows
 	 */
 
-	// DATE_LAST_CLEANED
+	// TODO: Make delete file/delete folders all in util classes
+	// TODO: Logging?
 
 //	jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
 //	jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
@@ -113,9 +114,6 @@ public class AppController {
 			if (getBuildSampleAssets()) {
 				UtilsBuildConvert.checkDataFoldersBuilt(getGunFunAppLocation());
 			}
-
-			doTableStuff(conn);
-
 			conn.close();
 
 		} catch (SQLException e) {
@@ -125,105 +123,6 @@ public class AppController {
 		}
 
 		return "index";
-	}
-
-	public static void doTableStuff(Connection conn) throws SQLException {
-
-		String tabcl = "\t";
-		String crlf = "\n";
-		String crlfcl = ";\n";
-		String crlfcm = ",\n";
-
-		StringBuffer dropBuffer = new StringBuffer();
-		StringBuffer trunacateBuffer = new StringBuffer();
-		StringBuffer createBuffer = new StringBuffer();
-		StringBuffer dataBuffer = new StringBuffer();
-		StringBuffer sequenceBuffer = new StringBuffer();
-
-		String sql = "SHOW TABLES";
-		ResultSet resultset = Utils.querySQL(conn, sql);
-		while (resultset.next()) {
-
-			String currentTableName = resultset.getString("TABLE_NAME");
-			ArrayList<String> columnNames = new ArrayList<String>();
-			String pkColumn = "";
-			long lastPk = 0;
-
-			dropBuffer.append("DROP TABLE IF EXISTS " + currentTableName + crlfcl);
-			trunacateBuffer.append("TRUNCATE TABLE " + currentTableName + crlfcl);
-			createBuffer.append("CREATE TABLE `" + currentTableName + "` (" + crlf);
-			ResultSet resultsettwo = Utils.querySQL(conn, "show columns from " + currentTableName);
-			while (resultsettwo.next()) {
-				String fieldName = resultsettwo.getString("FIELD");
-				String fieldType = resultsettwo.getString("TYPE");
-				String fieldNull = resultsettwo.getString("NULL");
-				String fieldKey = resultsettwo.getString("KEY");
-				String fieldDefault = resultsettwo.getString("DEFAULT");
-				columnNames.add(fieldName);
-
-				String defaultValue = " default ''";
-				if (fieldType.startsWith("BIGINT")) {
-					defaultValue = " default '0'";
-				} else if (fieldType.startsWith("BOOLEAN")) {
-					defaultValue = " default 'N'";
-				}
-
-				createBuffer.append(
-						tabcl + "`" + fieldName + "` " + fieldType + (fieldDefault.equals("NULL") ? defaultValue : "")
-								+ (fieldNull.equals("NO") ? " NOT NULL " : "")
-								+ (fieldKey.equals("PRI") ? "auto_increment PRIMARY KEY" : "") + crlfcm);
-				if (fieldKey.equals("PRI")) {
-					pkColumn = fieldName;
-				}
-			}
-			
-			Collections.sort(columnNames);
-			
-			String oldCreateBuffer = createBuffer.toString();
-			createBuffer = new StringBuffer();
-			createBuffer
-					.append(oldCreateBuffer.substring(0, oldCreateBuffer.length() - 2) + crlf + ")" + crlfcl + crlf);
-
-			StringBuffer dataBufferTemp = new StringBuffer();
-			dataBufferTemp.append("INSERT INTO " + currentTableName + " ("
-					+ columnNames.toString().replaceAll("\\[", "").replaceAll("\\]", "") + ") @VALUES ");
-
-			boolean hasData = false;
-			resultsettwo = Utils.querySQL(conn, "select * from " + currentTableName + " order by " + pkColumn);
-			while (resultsettwo.next()) {
-				hasData = true;
-				dataBufferTemp.append(", " + crlf + tabcl + "(");
-				for (String singleColumn : columnNames) {
-					String singleColumnValue = resultsettwo.getString(singleColumn) != null
-							&& resultsettwo.getString(singleColumn).length() > 0
-									? "'" + resultsettwo.getString(singleColumn).replaceAll("'", "''") + "', "
-									: "null, ";
-					dataBufferTemp.append(singleColumnValue);
-				}
-				String oldDataBuffer = dataBufferTemp.toString().replaceAll("@VALUES ,", "VALUES");
-				dataBufferTemp = new StringBuffer();
-				dataBufferTemp.append(oldDataBuffer.substring(0, oldDataBuffer.length() - 2) + ")");
-				lastPk = resultsettwo.getLong(pkColumn);
-			}
-			lastPk = lastPk + 1;
-
-			if (!currentTableName.equals("ROLES")) {
-				sequenceBuffer.append("ALTER TABLE " + currentTableName + " ALTER COLUMN " + pkColumn + " RESTART WITH "
-						+ lastPk + crlfcl);
-			}
-
-			if (hasData) {
-				dataBuffer.append(dataBufferTemp);
-				dataBuffer.append(crlfcl + crlf);
-			}
-		}
-
-		System.out.println(dropBuffer);
-		System.out.println(trunacateBuffer);
-		System.out.println(createBuffer.toString().replaceAll("DATE_LAST_CLEANED", "LAST_CLEANED_DATE"));
-		System.out.println(dataBuffer.toString().replaceAll("DATE_LAST_CLEANED", "LAST_CLEANED_DATE"));
-		System.out.println(sequenceBuffer);
-
 	}
 
 	@GetMapping("/frame_navigation")
@@ -1258,12 +1157,12 @@ public class AppController {
 	public String functionBackup(HttpServletRequest request, Model model)
 			throws ClassNotFoundException, SQLException, IOException {
 
+		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
+
 		ArrayList<String> backedUpItems = new ArrayList<String>();
 
-		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("DATA")) {
+		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("TAB")) {
 			backedUpItems.add("Data");
-
-			Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
 					+ new Date(System.currentTimeMillis()).toString() + " DATA TAB";
@@ -1273,23 +1172,53 @@ public class AppController {
 				oDirectory.mkdirs();
 			}
 
-			ArrayList<String> tableList = new ArrayList<>(
-					Arrays.asList("carry_sessions", "cleaning_reports", "cleaning_sessions", "registry", "roles",
-							"shooting_sessions", "users", "valid_calibers", "trivia_question_templates",
-							"trivia_question_templates_custom", "trivia_rounds", "trivia_round_questions"));
-			for (String tableName : tableList) {
-				Utils.exportSQLAsTabDelimitedDataFile(conn, "SELECT * FROM " + tableName,
-						backupFolderLocation + "\\" + tableName + ".tab", true);
+			String sql = "SHOW TABLES";
+			ResultSet resultset = Utils.querySQL(conn, sql);
+			while (resultset.next()) {
+
+				String currentTableName = resultset.getString("TABLE_NAME");
+				ArrayList<String> columnNames = new ArrayList<String>();
+				String pkColumn = "";
+
+				ResultSet resultsettwo = Utils.querySQL(conn, "show columns from " + currentTableName);
+				while (resultsettwo.next()) {
+					String fieldName = resultsettwo.getString("FIELD");
+					String fieldKey = resultsettwo.getString("KEY");
+
+					if (fieldKey.equals("PRI")) {
+						pkColumn = fieldName;
+					} else {
+						columnNames.add(fieldName);
+					}
+				}
+
+				Collections.sort(columnNames);
+
+				Utils.exportSQLAsTabDelimitedDataFile(conn,
+						"SELECT " + pkColumn + ", " + columnNames.toString().replaceAll("\\[", "").replaceAll("\\]", "")
+								+ " FROM " + currentTableName + " ORDER BY " + pkColumn,
+						backupFolderLocation + "\\" + currentTableName + ".tab", true);
+
 			}
 
-			conn.close();
+			String backupFolderLocationTwo = getGunFunAppLocation() + "\\_backup\\"
+					+ new Date(System.currentTimeMillis()).toString() + " data_tab.zip";
+
+			oDirectory = new File(backupFolderLocationTwo);
+			if (oDirectory.exists()) {
+				oDirectory.delete();
+			}
+
+			Utils.zipDirectory(backupFolderLocation, backupFolderLocationTwo);
+			Utils.deleteFolder(backupFolderLocation);
+
 		}
 
 		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("IMAGES")) {
 			backedUpItems.add("Images");
 
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
-					+ new Date(System.currentTimeMillis()).toString() + " IMAGES.zip";
+					+ new Date(System.currentTimeMillis()).toString() + " images.zip";
 
 			File oDirectory = new File(backupFolderLocation);
 			if (oDirectory.exists()) {
@@ -1304,7 +1233,7 @@ public class AppController {
 			backedUpItems.add("Manuals");
 
 			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
-					+ new Date(System.currentTimeMillis()).toString() + " MANUALS.zip";
+					+ new Date(System.currentTimeMillis()).toString() + " manuals.zip";
 
 			File oDirectory = new File(backupFolderLocation);
 			if (oDirectory.exists()) {
@@ -1331,10 +1260,126 @@ public class AppController {
 			Utils.copyFile(pathToResources, backupFolderLocation);
 		}
 
+		if (request.getParameter("what").equals("ALL") || request.getParameter("what").equals("SQL")) {
+			backedUpItems.add("SQL");
+
+			String backupFolderLocation = getGunFunAppLocation() + "\\_backup\\"
+					+ new Date(System.currentTimeMillis()).toString() + " data.sql";
+			backupSql(conn, backupFolderLocation);
+		}
+
+		conn.close();
+
 		String backedUpItemsDisplay = backedUpItems.toString().replaceAll("\\[", "").replaceAll("\\]", "");
 		model.addAttribute("MESSAGE", "Items backed up: " + backedUpItemsDisplay);
 
 		return "frame_main";
+
+	}
+
+	public void backupSql(Connection conn, String backupFolderLocation) throws SQLException, IOException {
+
+		String tabcl = "\t";
+		String crlf = "\n";
+		String crlfcl = ";\n";
+		String crlfcm = ",\n";
+
+		StringBuffer trunacateBuffer = new StringBuffer();
+		StringBuffer dropBuffer = new StringBuffer();
+		StringBuffer createBuffer = new StringBuffer();
+		StringBuffer dataBuffer = new StringBuffer();
+		StringBuffer sequenceBuffer = new StringBuffer();
+
+		String sql = "SHOW TABLES";
+		ResultSet resultset = Utils.querySQL(conn, sql);
+		while (resultset.next()) {
+
+			String currentTableName = resultset.getString("TABLE_NAME");
+			ArrayList<String> columnNames = new ArrayList<String>();
+			String pkColumn = "";
+			long lastPk = 0;
+
+			trunacateBuffer.append("TRUNCATE TABLE " + currentTableName + crlfcl);
+			dropBuffer.append("DROP TABLE IF EXISTS " + currentTableName + crlfcl);
+
+			createBuffer.append("CREATE TABLE `" + currentTableName + "` (" + crlf);
+			ResultSet resultsettwo = Utils.querySQL(conn, "show columns from " + currentTableName);
+			while (resultsettwo.next()) {
+				String fieldName = resultsettwo.getString("FIELD");
+				String fieldType = resultsettwo.getString("TYPE");
+				String fieldNull = resultsettwo.getString("NULL");
+				String fieldKey = resultsettwo.getString("KEY");
+				String fieldDefault = resultsettwo.getString("DEFAULT");
+				columnNames.add(fieldName);
+
+				String defaultValue = " default ''";
+				if (fieldType.startsWith("BIGINT")) {
+					defaultValue = " default '0'";
+				} else if (fieldType.startsWith("BOOLEAN")) {
+					defaultValue = " default 'N'";
+				}
+
+				createBuffer.append(
+						tabcl + "`" + fieldName + "` " + fieldType + (fieldDefault.equals("NULL") ? defaultValue : "")
+								+ (fieldNull.equals("NO") ? " NOT NULL " : "")
+								+ (fieldKey.equals("PRI") ? "auto_increment PRIMARY KEY" : "") + crlfcm);
+				if (fieldKey.equals("PRI")) {
+					pkColumn = fieldName;
+				}
+			}
+
+			Collections.sort(columnNames);
+
+			String oldCreateBuffer = createBuffer.toString();
+			createBuffer = new StringBuffer();
+			createBuffer
+					.append(oldCreateBuffer.substring(0, oldCreateBuffer.length() - 2) + crlf + ")" + crlfcl + crlf);
+
+			StringBuffer dataBufferTemp = new StringBuffer();
+			dataBufferTemp.append("INSERT INTO " + currentTableName + " ("
+					+ columnNames.toString().replaceAll("\\[", "").replaceAll("\\]", "") + ") @VALUES ");
+
+			boolean hasData = false;
+			resultsettwo = Utils.querySQL(conn, "select * from " + currentTableName + " order by " + pkColumn);
+			while (resultsettwo.next()) {
+				hasData = true;
+				dataBufferTemp.append(", " + crlf + tabcl + "(");
+				for (String singleColumn : columnNames) {
+					String singleColumnValue = resultsettwo.getString(singleColumn) != null
+							&& resultsettwo.getString(singleColumn).length() > 0
+									? "'" + resultsettwo.getString(singleColumn).replaceAll("'", "''") + "', "
+									: "null, ";
+					dataBufferTemp.append(singleColumnValue);
+				}
+				String oldDataBuffer = dataBufferTemp.toString().replaceAll("@VALUES ,", "VALUES");
+				dataBufferTemp = new StringBuffer();
+				dataBufferTemp.append(oldDataBuffer.substring(0, oldDataBuffer.length() - 2) + ")");
+				lastPk = resultsettwo.getLong(pkColumn);
+			}
+			lastPk = lastPk + 1;
+
+			if (!currentTableName.equals("ROLES")) {
+				sequenceBuffer.append("ALTER TABLE " + currentTableName + " ALTER COLUMN " + pkColumn + " RESTART WITH "
+						+ lastPk + crlfcl);
+			}
+
+			if (hasData) {
+				dataBuffer.append(dataBufferTemp);
+				dataBuffer.append(crlfcl + crlf);
+			}
+		}
+
+		trunacateBuffer.append(crlf);
+		dropBuffer.append(crlf);
+
+		StringBuffer writeBuffer = new StringBuffer();
+		writeBuffer.append(trunacateBuffer);
+		writeBuffer.append(dropBuffer);
+		writeBuffer.append(createBuffer);
+		writeBuffer.append(dataBuffer);
+		writeBuffer.append(sequenceBuffer);
+
+		Utils.writeStringToFile(writeBuffer.toString(), backupFolderLocation);
 
 	}
 
@@ -1657,40 +1702,22 @@ public class AppController {
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
 		Utils.executeSQL(conn, "TRUNCATE TABLE trivia_question_templates");
-		if (env.getProperty("spring.datasource.driverClassName").equals("com.mysql.cj.jdbc.Driver")) {
-			Utils.executeSQL(conn, "ALTER TABLE trivia_question_templates AUTO_INCREMENT = 1");
-
-		} else {
-			Utils.executeSQL(conn, "ALTER TABLE trivia_question_templates ALTER COLUMN TRIVIA_PK RESTART WITH 1");
-		}
+		Utils.executeSQL(conn, "ALTER TABLE trivia_question_templates ALTER COLUMN TRIVIA_PK RESTART WITH 1");
 
 		Utils.executeSQL(conn, "TRUNCATE TABLE trivia_rounds");
 		Utils.executeSQL(conn, "TRUNCATE TABLE trivia_round_questions");
 
-		if (env.getProperty("spring.datasource.driverClassName").equals("com.mysql.cj.jdbc.Driver")) {
-			Utils.executeSQL(conn, "ALTER TABLE trivia_rounds AUTO_INCREMENT = 1");
-			Utils.executeSQL(conn, "ALTER TABLE trivia_round_questions AUTO_INCREMENT = 1");
-		} else {
-			Utils.executeSQL(conn, "ALTER TABLE trivia_rounds ALTER COLUMN ROUND_PK RESTART WITH 1");
-			Utils.executeSQL(conn, "ALTER TABLE trivia_round_questions ALTER COLUMN QUESTION_PK RESTART WITH 1");
-		}
+		Utils.executeSQL(conn, "ALTER TABLE trivia_rounds ALTER COLUMN ROUND_PK RESTART WITH 1");
+		Utils.executeSQL(conn, "ALTER TABLE trivia_round_questions ALTER COLUMN QUESTION_PK RESTART WITH 1");
 
 		// put standard questions
 		List<Registry> gunRegistryEntries = (List<Registry>) gunRegistryRepo.findAll();
 		addStandardQuestionsForGuns(gunRegistryEntries);
 
-		if (env.getProperty("spring.datasource.driverClassName").equals("com.mysql.cj.jdbc.Driver")) {
-			Utils.executeSQL(conn, "INSERT INTO trivia_question_templates "
-					+ "(QUESTION_TYPE, QUESTION, QUESTION_RESPONSES, CORRECT_RESPONSE, IMAGE_LOCATION, NICKNAME) VALUES "
-					+ " (SELECT QUESTION_TYPE, QUESTION, QUESTION_RESPONSES, CORRECT_RESPONSE, IMAGE_LOCATION, NICKNAME FROM "
-					+ " trivia_question_templates_custom) ");
-
-		} else {
-			Utils.executeSQL(conn, "INSERT INTO trivia_question_templates "
-					+ "(QUESTION_TYPE, QUESTION, QUESTION_RESPONSES, CORRECT_RESPONSE, IMAGE_LOCATION, NICKNAME) "
-					+ " (SELECT QUESTION_TYPE, QUESTION, QUESTION_RESPONSES, CORRECT_RESPONSE, IMAGE_LOCATION, NICKNAME FROM "
-					+ " trivia_question_templates_custom) ");
-		}
+		Utils.executeSQL(conn, "INSERT INTO trivia_question_templates "
+				+ "(QUESTION_TYPE, QUESTION, QUESTION_RESPONSES, CORRECT_RESPONSE, IMAGE_LOCATION, NICKNAME) "
+				+ " (SELECT QUESTION_TYPE, QUESTION, QUESTION_RESPONSES, CORRECT_RESPONSE, IMAGE_LOCATION, NICKNAME FROM "
+				+ " trivia_question_templates_custom) ");
 
 		conn.close();
 

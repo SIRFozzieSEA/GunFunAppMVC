@@ -69,6 +69,22 @@ public class Utils {
 		Files.delete(filePath);
 	}
 
+	public static void deleteFolder(String pathToFolder) {
+		File file = new File(pathToFolder);
+		deleteFolder(file);
+	}
+
+	private static void deleteFolder(File file) {
+		for (File subFile : file.listFiles()) {
+			if (subFile.isDirectory()) {
+				deleteFolder(subFile);
+			} else {
+				subFile.delete();
+			}
+		}
+		file.delete();
+	}
+
 	public static Connection getAccessConnection(String accessDbPath) throws ClassNotFoundException, SQLException {
 		String dbURL = "jdbc:ucanaccess://" + accessDbPath;
 		Connection o_connection_access = DriverManager.getConnection(dbURL);
