@@ -9,9 +9,23 @@
 <meta http-equiv="Expires" content="0" />
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <link rel="stylesheet" type="text/css" href="/main.css" />
+<script src="/validation.js"></script>
 </head>
 <body onLoad="document.f1.Nickname.focus()">
-	<form name="f1" action="#" th:action="@{/registry_search}" method="post">
+	<script>
+		function genericValidator(o_form)
+		{
+			if (!checkNumericValue('BarrelLengthMin', 'Barrel Length Min', 1, 50)) return false;
+			if (!checkNumericValue('BarrelLengthMax', 'Barrel Length Max', 1, 50)) return false;
+			if (!checkNumericValue('PurchaseCostMin', 'Purchase Cost Min', 1, 5000)) return false;
+			if (!checkNumericValue('PurchaseCostMax', 'Purchase Cost Max', 1, 5000)) return false;
+			if (!checkH2Date('PurchaseDateMin', 'Purchase Date Min')) return false;
+			if (!checkH2Date('PurchaseDateMax', 'Purchase Date Max')) return false;
+			
+			return true;
+		}
+	</script>
+	<form name="f1" onsubmit="return genericValidator(this)" action="#" th:action="@{/registry_search}" method="post">
 
 		<table align="center" border="0">
 
@@ -35,8 +49,8 @@
 									name="NicknameOrder" style="width: 20px" type="text" autocomplete="off"></td>
 								<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 								<td><b>Barrel Length:</b><br>
-									<input name="BarrelLengthMin" style="width: 72px" type="text" autocomplete="off">
-									to <input name="BarrelLengthMax" style="width: 73px" type="text" autocomplete="off">
+									<input id="BarrelLengthMin" name="BarrelLengthMin" style="width: 72px" type="text" autocomplete="off">
+									to <input id="BarrelLengthMax" name="BarrelLengthMax" style="width: 73px" type="text" autocomplete="off">
 									<br>
 								<input checked="true" name="BarrelLengthRadio" type="radio"
 									value="or ">Or <input name="BarrelLengthRadio"
@@ -54,9 +68,9 @@
 									value="and"> And &nbsp;&nbsp;&nbsp;Order: <input
 									name="MakeOrder" style="width: 20px" type="text" autocomplete="off"></td>
 								<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-								<td><b>Purchase Price:</b><br>
-									<input name="PurchaseCostMin" style="width: 72px" type="text" autocomplete="off">
-									to <input name="PurchaseCostMax" style="width: 73px"
+								<td><b>Purchase Cost:</b><br>
+									<input id="PurchaseCostMin" name="PurchaseCostMin" style="width: 72px" type="text" autocomplete="off">
+									to <input id="PurchaseCostMax" name="PurchaseCostMax" style="width: 73px"
 									type="text" autocomplete="off"> <br>
 								<input checked="true" name="PurchaseCostRadio" type="radio"
 									value="or ">Or <input name="PurchaseCostRadio"
@@ -72,8 +86,8 @@
 									type="text" autocomplete="off"></td>
 								<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 								<td><b>Purchase Date:</b><br>
-									<input name="PurchaseDateMin" style="width: 72px" type="text" autocomplete="off">
-									to <input name="PurchaseDateMax" style="width: 73px" type="text" autocomplete="off">
+									<input id="PurchaseDateMin" name="PurchaseDateMin" style="width: 72px" type="text" autocomplete="off">
+									to <input id="PurchaseDateMax" name="PurchaseDateMax" style="width: 73px" type="text" autocomplete="off">
 									<br>
 								<input checked="true" name="PurchaseDateRadio" type="radio"
 									value="or ">Or <input name="PurchaseDateRadio" type="radio"

@@ -9,9 +9,45 @@
 <meta http-equiv="Expires" content="0" />
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <link rel="stylesheet" type="text/css" href="/main.css" />
+<script src="/validation.js"></script>
 </head>
 <body onLoad="document.f1.nickname.focus()">
-	<form name="f1" action="#" th:action="@{/registry_add}" th:object="${gunRegistry}" method="post" enctype="multipart/form-data">
+	<script>
+		function genericValidator(o_form)
+		{
+			if (!checkFieldLength('nickname', 'Nickname', 3, 20, true)) return false;
+			if (!checkFieldLength('make', 'Make', 1, 30, true)) return false;
+			if (!checkFieldLength('model', 'Model', 1, 50, true)) return false;
+			if (!checkFieldLength('caliber', 'Caliber', 1, 25, true)) return false;
+			
+			if (!checkFieldRequired('barrelLength', 'Barrel Length')) return false;
+			if (!checkNumericValueDecimal('barrelLength', 'Barrel Length', 1, 50)) return false;
+			
+			if (!checkFieldLength('frameMaterial', 'Frame Material', 1, 20, true)) return false;	
+			
+			if (!checkFieldRequired('purchaseDate', 'Purchase Date')) return false;
+			if (!checkH2Date('purchaseDate', 'Purchase Date')) return false;
+			
+			if (!checkFieldRequired('purchaseCost', 'Purchase Cost')) return false;
+			if (!checkNumericValueDecimal('purchaseCost', 'Purchase Cost', 1, 5000)) return false;
+			
+			if (!checkFieldRequired('lastFiredDate', 'Last Fired Date')) return false;
+			if (!checkH2Date('lastFiredDate', 'Last Fired Date')) return false;
+			
+			if (!checkFieldRequired('lastCleanedDate', 'Last Cleaned Date')) return false;
+			if (!checkH2Date('lastCleanedDate', 'Last Cleaned Date')) return false;
+			
+			if (!checkFieldRequired('lastCarriedDate', 'Last Carried Date')) return false;
+			if (!checkH2Date('lastCarriedDate', 'Last Carried Date')) return false;
+			
+			if (!checkFieldLength('sightedDate', 'Last Sighted Date', 0, 20, true)) return false;
+			if (!checkFieldLength('serial', 'Serial Number', 1, 20, true)) return false;
+			if (!checkFieldLength('notes', 'Notes', 0, 200, true)) return false;		
+			
+			return true;
+		}
+	</script>
+	<form name="f1" onsubmit="return genericValidator(this)" action="#" th:action="@{/registry_add}" th:object="${gunRegistry}" method="post" enctype="multipart/form-data">
 
 		<table align="center" border="0">
 
@@ -55,7 +91,7 @@
 							</tr>
 							
 							<tr>
-								<td valign="top"><span class="field-label">Barrel:<br />
+								<td valign="top"><span class="field-label">Barrel Length:<br />
 								<input tabindex="5" th:field="*{barrelLength}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
@@ -70,18 +106,18 @@
 							</tr>
 							
 							<tr>
-								<td valign="top"><span class="field-label">Purchase Price:<br />
+								<td valign="top"><span class="field-label">Purchase Cost:<br />
 								<input tabindex="8" th:field="*{purchaseCost}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
 							<tr>
 								<td valign="top"><span class="field-label-gray">Last Fired Date:<br />
-								<input tabindex="9" readonly="true" th:field="*{lastFiredDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="9" th:field="*{lastFiredDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 							</tr>
 							
 							<tr>
 								<td valign="top"><span class="field-label-gray">Last Cleaned Date:<br />
-								<input tabindex="10" readonly="true" th:field="*{lastCleanedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="10" th:field="*{lastCleanedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 								<td valign="top">&nbsp;</td>
 								<td valign="top"><span class="field-label">Last Sighted Date:<br />
 									<input tabindex="12" th:field="*{sightedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
@@ -91,7 +127,7 @@
 							
 							<tr>
 								<td valign="top"><span class="field-label-gray">Last Carried Date:<br />
-								<input tabindex="11" readonly="true" th:field="*{lastCarriedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
+								<input tabindex="11" th:field="*{lastCarriedDate}" class="field-label-input" type="text" autocomplete="off" /></span></td>
 								<td valign="top">&nbsp;</td>
 								<td valign="top"><span class="field-label">Serial Number:<br />
 									<input tabindex="13" th:field="*{serial}" class="field-label-input" type="text" autocomplete="off" /></span></td>
