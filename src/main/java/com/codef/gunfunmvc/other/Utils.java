@@ -251,7 +251,7 @@ public class Utils {
 			for (int i = 0; i < oRsmd.getColumnCount(); i++) {
 				String sValue = resultset.getString(i + 1);
 				if (sValue == null || sValue.equals("null")) {
-					sValue = "&nbsp;";
+					sValue = "";
 				}
 
 				if (dateColumnForBlankRow != null && columnList.get(i).equals(dateColumnForBlankRow)) {
@@ -298,7 +298,7 @@ public class Utils {
 			for (int i = 0; i < oRsmd.getColumnCount(); i++) {
 				String sValue = resultset.getString(i + 1);
 				if (sValue == null || sValue.equals("null")) {
-					sValue = "&nbsp;";
+					sValue = "";
 				}
 				oExportFileStringbuffer.append("<td>" + sValue + "</td>");
 			}

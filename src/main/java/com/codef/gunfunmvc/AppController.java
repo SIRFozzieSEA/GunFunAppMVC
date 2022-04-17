@@ -100,10 +100,9 @@ public class AppController {
 	 */
 
 	// TODO: Make delete file/delete folders all in util classes
-	// TODO: Logging?
 
-//	jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
-//	jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
+	//	jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
+	//	jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
 
 	@GetMapping("/")
 	public String indexLaunch(Model model) throws SQLException, IOException {
@@ -507,6 +506,7 @@ public class AppController {
 				+ " ORDER by DATE_CARRIED DESC, NICKNAME";
 		model.addAttribute("report",
 				Utils.makeSQLAsArrayListHashMap(conn, sql, "DATE_CARRIED", "DAY_OF_WEEK", "Sunday", null));
+		
 		conn.close();
 
 		return "log_carry";
