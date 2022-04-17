@@ -68,13 +68,6 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
-		<!-- 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-		</dependency>
-		 -->
-
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -92,13 +85,6 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>  -->
-
-		<!-- 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-		</dependency>
-		 -->
 
 		<dependency>
 			<groupId>com.h2database</groupId>

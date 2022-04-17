@@ -43,7 +43,7 @@ public class Registry {
 	@Column(name = "model", length = 50)
 	private String model;
 
-	@Column(name = "caliber", length = 10)
+	@Column(name = "caliber", length = 25)
 	private String caliber;
 
 	@Column(name = "barrel_length")
@@ -73,14 +73,14 @@ public class Registry {
 	@Column(name = "gun_is_dirty")
 	private Boolean gunIsDirty;
 	
-	@Column(name = "last_fired_date", length = 20)
-	private String lastFiredDate;
+	@Column(name = "last_fired_date")
+	private java.sql.Date lastFiredDate;
 	
-	@Column(name = "last_cleaned_date", length = 20)
-	private String lastCleanedDate;
+	@Column(name = "last_cleaned_date")
+	private java.sql.Date lastCleanedDate;
 	
-	@Column(name = "last_carried_date", length = 20)
-	private String lastCarriedDate;
+	@Column(name = "last_carried_date")
+	private java.sql.Date lastCarriedDate;
 	
 	@Column(name = "notes", length = 200)
 	private String notes;

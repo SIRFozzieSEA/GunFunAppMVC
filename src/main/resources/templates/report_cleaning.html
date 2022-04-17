@@ -29,7 +29,7 @@
 								<td class="table-report-head-center"><a href="?orderBy=NICKNAME">Gun Nickname</a></td>
 								<td class="table-report-head-center"><a href="?orderBy=CALIBER">Caliber</a></td>
 								<td class="table-report-head-center"><a href="?orderBy=LAST_DATE_FIRED">Last Date Fired</a></td>
-								<td class="table-report-head-center"><a href="?orderBy=DATE_LAST_CLEANED">Last Date Cleaned</a></td>
+								<td class="table-report-head-center"><a href="?orderBy=LAST_CLEANED_DATE">Last Date Cleaned</a></td>
 								<td class="table-report-head-center"><a href="?orderBy=TOTAL_ROUNDS_FIRED">Total Rounds Fired</a></td>
 							</tr>
 							
@@ -41,7 +41,7 @@
 								<td class="table-report-row-left-more-vspace" th:text="${row.get('NICKNAME')}">-</td>
 								<td class="table-report-row-left-more-vspace" th:text="${row.get('CALIBER')}">-</td>
 								<td class="table-report-row-center-more-vspace" th:text="${row.get('LAST_DATE_FIRED')}">-</td>
-								<td class="table-report-row-center-more-vspace" th:text="${row.get('DATE_LAST_CLEANED')}">-</td>
+								<td class="table-report-row-center-more-vspace" th:text="${row.get('LAST_CLEANED_DATE')}">-</td>
 								<td class="table-report-row-right-more-vspace" style="padding-right: 65px" th:text="${row.get('TOTAL_ROUNDS_FIRED')}">-</td>
 							</tr>
 							

@@ -29,7 +29,7 @@ public class ValidCaliber {
 	@Column(name = "valid_caliber_pk")
 	private long validCaliberPk;
 
-	@Column(name = "caliber", length = 20)
+	@Column(name = "caliber", length = 25)
 	private String caliber;
 
 	@Column(name = "shoots_caliber", length = 50)
