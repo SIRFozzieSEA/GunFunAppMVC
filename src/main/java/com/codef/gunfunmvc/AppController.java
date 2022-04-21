@@ -99,10 +99,8 @@ public class AppController {
 	 * Main App Windows
 	 */
 
-	// TODO: Make delete file/delete folders all in util classes
-
-	//	jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
-	//	jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
+	// jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
+	// jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
 
 	@GetMapping("/")
 	public String indexLaunch(Model model) throws SQLException, IOException {
@@ -137,7 +135,7 @@ public class AppController {
 
 			Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
-			String totalGuns = Utils.getStringValueFromTable(conn, "SELECT count(*) as TOTAL_COUNT FROM registry",
+			String totalGuns = Utils.getStringValueFromTable(conn, "SELECT count(GUN_PK) as TOTAL_COUNT FROM registry",
 					"TOTAL_COUNT");
 
 			if (Long.parseLong(totalGuns) > 0) {
@@ -177,13 +175,13 @@ public class AppController {
 						"SELECT MIN(barrel_length) as MIN_BL FROM registry", "MIN_BL");
 				model.addAttribute("minBarrel", String.format("%,.2f", Double.parseDouble(minBarrel)));
 
-				String sql = "SELECT MAKE, count(*) as TOTAL_COUNT FROM registry GROUP BY MAKE ORDER BY MAKE";
+				String sql = "SELECT MAKE, count(MAKE) as TOTAL_COUNT FROM registry GROUP BY MAKE ORDER BY MAKE";
 				model.addAttribute("manufacturers", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 
-				sql = "SELECT CALIBER, count(*) as TOTAL_COUNT FROM registry GROUP BY CALIBER ORDER BY CALIBER";
+				sql = "SELECT CALIBER, count(CALIBER) as TOTAL_COUNT FROM registry GROUP BY CALIBER ORDER BY CALIBER";
 				model.addAttribute("calibers", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 
-				sql = "SELECT FRAME_MATERIAL, count(*) as TOTAL_COUNT FROM registry GROUP BY FRAME_MATERIAL ORDER BY FRAME_MATERIAL";
+				sql = "SELECT FRAME_MATERIAL, count(FRAME_MATERIAL) as TOTAL_COUNT FROM registry GROUP BY FRAME_MATERIAL ORDER BY FRAME_MATERIAL";
 				model.addAttribute("frameMaterials",
 						Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
 
@@ -506,7 +504,7 @@ public class AppController {
 				+ " ORDER by DATE_CARRIED DESC, NICKNAME";
 		model.addAttribute("report",
 				Utils.makeSQLAsArrayListHashMap(conn, sql, "DATE_CARRIED", "DAY_OF_WEEK", "Sunday", null));
-		
+
 		conn.close();
 
 		return "log_carry";
@@ -730,7 +728,7 @@ public class AppController {
 				null);
 		ArrayList<ArrayList<HashMap<String, String>>> allGuns = getGunsInTwoColumn(gunSearch);
 
-		String totalGuns = Utils.getStringValueFromTable(conn, "SELECT count(*) as TOTAL_COUNT FROM registry",
+		String totalGuns = Utils.getStringValueFromTable(conn, "SELECT count(GUN_PK) as TOTAL_COUNT FROM registry",
 				"TOTAL_COUNT");
 
 		model.addAttribute("gunsFound", Integer.valueOf(totalGuns));
@@ -1397,6 +1395,10 @@ public class AppController {
 		model.addAttribute("getAllMakes", getAllMakes());
 		model.addAttribute("getAllModels", getAllModels());
 		model.addAttribute("getAllCalibers", getAllCalibers());
+		
+		String maxQuestions = Utils.getStringValueFromTable(conn,
+				"SELECT count(trivia_pk) AS MAX_QUESTIONS FROM trivia_question_templates", "MAX_QUESTIONS");
+		model.addAttribute("maxQuestions", Integer.parseInt(maxQuestions));
 
 		conn.close();
 
@@ -1724,7 +1726,7 @@ public class AppController {
 		return "Question rounds, scores and questions have been rebuilt.";
 	}
 
-	private Long createNewRound(String username, long no_of_questions) throws SQLException {
+	private Long createNewRound(String username, long no_of_questions) throws SQLException, IOException {
 
 		Connection conn = jdbcTemplateOne.getDataSource().getConnection();
 
@@ -1735,23 +1737,24 @@ public class AppController {
 		gunTriviaRoundsRepo.save(gunTriviaRounds);
 
 		Long roundPk = gunTriviaRounds.getRoundPk();
-		Long totalQuestionsAvailable = Utils.getRowsCountInDataTable(conn, "trivia_question_templates");
 
-		HashSet<Integer> randomIds = new HashSet<Integer>();
+		String sql = "SELECT trivia_pk FROM trivia_question_templates";
+		ArrayList<HashMap<String, String>> totalQuestionsAvailable = Utils.makeSQLAsArrayListHashMap(conn, sql, null,
+				null, null, null);
+
+		HashSet<Long> randomIds = new HashSet<Long>();
 		Random random = new Random();
-		while (true) {
-			int nextRandom = random.nextInt(totalQuestionsAvailable.intValue() + 1);
-			if (nextRandom != 0) {
-				randomIds.add(nextRandom);
-			}
-			if (randomIds.size() == no_of_questions)
-				break;
+		for (int i = 0; i < no_of_questions; i++) {
+			int randomIndex = random.nextInt(totalQuestionsAvailable.size());
+			HashMap<String, String> randomQuestion = totalQuestionsAvailable.get(randomIndex);
+			randomIds.add(Long.parseLong(randomQuestion.get("TRIVIA_PK")));
+			totalQuestionsAvailable.remove(randomIndex);
 		}
 
-		for (int singleId : randomIds) {
+		for (long singleId : randomIds) {
 			try {
-				TriviaQuestionTemplate gunTriviaTemplateQuestions = gunTriviaTemplateQuestionsRepo
-						.findById(Long.valueOf(singleId)).get();
+				TriviaQuestionTemplate gunTriviaTemplateQuestions = gunTriviaTemplateQuestionsRepo.findById(singleId)
+						.get();
 
 				TriviaRoundQuestion gunTriviaRoundsQuestions = new TriviaRoundQuestion();
 				gunTriviaRoundsQuestions.setRoundPk(roundPk);

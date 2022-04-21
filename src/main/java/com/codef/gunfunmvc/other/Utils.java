@@ -91,12 +91,6 @@ public class Utils {
 		return o_connection_access;
 	}
 
-	public static long getRowsCountInDataTable(Connection conn, String tablename) throws SQLException {
-		ResultSet result = conn.createStatement().executeQuery("SELECT COUNT(*) FROM " + tablename);
-		result.next();
-		return result.getLong(1);
-	}
-
 	public static void executeSQL(Connection conn, String sql) throws SQLException {
 //		System.out.println("execute: " + sql);
 		conn.createStatement().execute(sql);
