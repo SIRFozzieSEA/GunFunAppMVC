@@ -67,7 +67,7 @@
 								<td valign="top"><span class="field-label">Nickname:</span><br/>
 								<input tabindex="1" th:field="*{nickname}" class="field-label-input" type="text" autocomplete="off" /></td>
 								<td valign="top" rowspan="9">&nbsp;</td>
-								<td class="auto-style2" colspan="5" rowspan="9" valign="bottom">
+								<td colspan="5" rowspan="9" valign="bottom">
 									<input tabindex="50" style="margin-top: 19px" type="file" name="gunPhoto" accept="image/jpeg" autocomplete="off" /><BR>
 									<a th:href="'/getImage?imageName=/large/' + ${gunRegistry.getNickname()} + '.jpg'" target="_blank">
 									<img border="2" alt="" th:src="'/getImage?imageName=/medium/' + ${gunRegistry.getNickname()} + '.jpg'" /></a>

@@ -7,39 +7,22 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-<style type="text/css">
-
-.auto-style8 {
-	text-align: center;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	font-size: large;
-	font-weight: bold;
-	padding-bottom: 6px;
-}
-
-a {
-	color: #000000;
-}
-a:visited {
-	color: #000000;
-}
-.auto-style9 {
-	text-align: left;
-}
-.auto-style10 {
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	font-size: small;
-}
-.auto-style11 {
-	text-align: right;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	font-size: small;
-	font-weight: bold;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="/main.css" />
+<script src="/validation.js"></script>
 </head>
 <body style="margin: 20px; background-color: #FFFF99">
-<form action="#" th:action="@{/quiz/question}" method="post">
+	<script>
+		function genericValidator(o_form)
+		{
+			if (!checkFieldLength('contestantName', 'Contestant Name', 2, 20, true)) return false;
+			
+			if (!checkFieldRequired('noOfQuestions', 'Number of Questions')) return false;
+			if (!checkNumericValue('noOfQuestions', 'Number of Questions', 1, [[${maxQuestions}]])) return false;	
+			
+			return true;
+		}
+	</script>
+<form action="#" onsubmit="return genericValidator(this)" th:action="@{/quiz/question}" method="post">
 	<table align="center" cellpadding="2" cellspacing="0">
 		<tr>
 			<td colspan="2" class="auto-style8" th:text="${reportTitle}">-</td>
@@ -52,12 +35,12 @@ a:visited {
 		
 		<tr>
 			<td class="auto-style11">Contestant Name:</td>
-			<td><input name="contestantName" style="width: 168px" type="text" autocomplete="off" /></td>
+			<td><input id="contestantName" name="contestantName" style="width: 168px" type="text" autocomplete="off" /></td>
 		</tr>
 		
 		<tr>
 			<td class="auto-style11">No. of Questions:</td>
-			<td><input name="noOfQuestions" style="width: 40px" type="text" autocomplete="off" /></td>
+			<td><input id="noOfQuestions" name="noOfQuestions" style="width: 40px" type="text" autocomplete="off" /></td>
 		</tr>
 		
 		<tr>
