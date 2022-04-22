@@ -81,7 +81,7 @@ a:visited {
 		</tr>
 		
 		<tr>
-			<td class="auto-style10a" th:text="${score}">-</td>
+			<td class="auto-style10a" th:text="'Your score is ' + ${#numbers.formatDecimal(score, 0, 'COMMA', 2, 'POINT')} + '%'">-</td>
 		</tr>
 		
 		<tr>

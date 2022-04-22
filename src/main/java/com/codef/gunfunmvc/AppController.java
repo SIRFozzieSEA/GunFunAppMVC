@@ -98,6 +98,8 @@ public class AppController {
 	/*
 	 * Main App Windows
 	 */
+	
+	// TODO: Finish auto-style edits, validation
 
 	// jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
 	// jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
@@ -142,38 +144,37 @@ public class AppController {
 
 				String maxCost = Utils.getStringValueFromTable(conn,
 						"SELECT MAX(purchase_cost) as MAX_COST FROM registry", "MAX_COST");
-				model.addAttribute("maxCost", String.format("%,.2f", Double.parseDouble(maxCost)));
+				model.addAttribute("maxCost", Double.parseDouble(maxCost));
 
 				String totalCost = Utils.getStringValueFromTable(conn,
 						"SELECT SUM(purchase_cost) as TOTAL_COST FROM registry", "TOTAL_COST");
-				model.addAttribute("totalCost", String.format("%,.2f", Double.parseDouble(totalCost)));
+				model.addAttribute("totalCost", Double.parseDouble(totalCost));
 
 				String totalMarketCost = Utils.getStringValueFromTable(conn,
 						"SELECT SUM(market_cost) as MARKET_COST FROM registry", "MARKET_COST");
-				model.addAttribute("totalMarketCost", String.format("%,.2f", Double.parseDouble(totalMarketCost)));
+				model.addAttribute("totalMarketCost", Double.parseDouble(totalMarketCost));
 
-				model.addAttribute("totalDifferenceCost",
-						String.format("%,.2f", Double.parseDouble(totalMarketCost) - Double.parseDouble(totalCost)));
+				model.addAttribute("totalDifferenceCost", Double.parseDouble(totalMarketCost) - Double.parseDouble(totalCost));
 
 				String avgCost = Utils.getStringValueFromTable(conn,
 						"SELECT avg(purchase_cost) as AVG_COST FROM registry", "AVG_COST");
-				model.addAttribute("avgCost", String.format("%,.2f", Double.parseDouble(avgCost)));
+				model.addAttribute("avgCost", Double.parseDouble(avgCost));
 
 				String minCost = Utils.getStringValueFromTable(conn,
 						"SELECT MIN(purchase_cost) as MIN_COST FROM registry", "MIN_COST");
-				model.addAttribute("minCost", String.format("%,.2f", Double.parseDouble(minCost)));
+				model.addAttribute("minCost", Double.parseDouble(minCost));
 
 				String maxBarrel = Utils.getStringValueFromTable(conn,
 						"SELECT MAX(barrel_length) as MAX_BL FROM registry", "MAX_BL");
-				model.addAttribute("maxBarrel", String.format("%,.2f", Double.parseDouble(maxBarrel)));
+				model.addAttribute("maxBarrel", Double.parseDouble(maxBarrel));
 
 				String avgBarrel = Utils.getStringValueFromTable(conn,
 						"SELECT avg(barrel_length) as AVG_BL FROM registry", "AVG_BL");
-				model.addAttribute("avgBarrel", String.format("%,.2f", Double.parseDouble(avgBarrel)));
+				model.addAttribute("avgBarrel", Double.parseDouble(avgBarrel));
 
 				String minBarrel = Utils.getStringValueFromTable(conn,
 						"SELECT MIN(barrel_length) as MIN_BL FROM registry", "MIN_BL");
-				model.addAttribute("minBarrel", String.format("%,.2f", Double.parseDouble(minBarrel)));
+				model.addAttribute("minBarrel", Double.parseDouble(minBarrel));
 
 				String sql = "SELECT MAKE, count(MAKE) as TOTAL_COUNT FROM registry GROUP BY MAKE ORDER BY MAKE";
 				model.addAttribute("manufacturers", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
@@ -300,8 +301,14 @@ public class AppController {
 				+ "AS LAST_DATE_CARRIED FROM carry_sessions INNER JOIN registry ON registry.NICKNAME = "
 				+ "carry_sessions.NICKNAME GROUP BY  carry_sessions.NICKNAME, CALIBER ORDER BY " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
-		sql = "SELECT SUM(NO_OF_ROUNDS) AS REPORT_TOTAL FROM cleaning_reports";
-		model.addAttribute("reportTotal", Utils.getStringValueFromTable(conn, sql, "REPORT_TOTAL"));
+		
+		long totalCarryDays = 0;
+		ResultSet resultset = Utils.querySQL(conn, sql);
+		while (resultset.next()) 
+		{
+			totalCarryDays = totalCarryDays + resultset.getInt("TOTAL_TIMES_CARRIED");
+		}
+		model.addAttribute("reportTotal", Long.toString(totalCarryDays));
 
 		conn.close();
 		return "report_carry";
@@ -321,6 +328,14 @@ public class AppController {
 				+ "MAX(LAST_CLEANED_DATE) AS LAST_CLEANED_DATE FROM cleaning_reports WHERE CALIBER != '' group by NICKNAME, "
 				+ "CALIBER order by " + orderBy;
 		model.addAttribute("report", Utils.makeSQLAsArrayListHashMap(conn, sql, null, null, null, null));
+		
+		long totalRoundFired = 0;
+		ResultSet resultset = Utils.querySQL(conn, sql);
+		while (resultset.next()) 
+		{
+			totalRoundFired = totalRoundFired + resultset.getInt("TOTAL_ROUNDS_FIRED");
+		}
+		model.addAttribute("reportTotal", Long.toString(totalRoundFired));
 
 		conn.close();
 		return "report_cleaning";
@@ -338,14 +353,14 @@ public class AppController {
 
 		String sumPC = Utils.getStringValueFromTable(conn, "SELECT SUM(purchase_cost) as SUM_PC FROM registry",
 				"SUM_PC");
-		model.addAttribute("SUM_PC", String.format("%,.0f", Double.parseDouble(sumPC)));
+		model.addAttribute("SUM_PC", Double.parseDouble(sumPC));
 
 		String sumMK = Utils.getStringValueFromTable(conn, "SELECT SUM(market_cost) as SUM_MK FROM registry", "SUM_MK");
-		model.addAttribute("SUM_MK", String.format("%,.0f", Double.parseDouble(sumMK)));
+		model.addAttribute("SUM_MK", Double.parseDouble(sumMK));
 
 		String sumDiff = Utils.getStringValueFromTable(conn,
 				"SELECT (SUM(market_cost) - SUM(purchase_cost)) as SUM_DIFF FROM registry", "SUM_DIFF");
-		model.addAttribute("SUM_DIFF", String.format("%,.0f", Double.parseDouble(sumDiff)));
+		model.addAttribute("SUM_DIFF", Double.parseDouble(sumDiff));
 
 		conn.close();
 
@@ -1510,7 +1525,7 @@ public class AppController {
 			conn.close();
 
 			model.addAttribute("reportTitle", "Quiz Complete!");
-			model.addAttribute("score", "Your score is " + String.format("%,.2f", score) + "%");
+			model.addAttribute("score", score);
 
 			return "quiz_complete";
 

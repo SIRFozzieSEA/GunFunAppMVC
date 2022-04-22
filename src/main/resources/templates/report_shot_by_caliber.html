@@ -35,7 +35,7 @@
 							
 							<tr th:each="row : ${report}">
 								<td class="table-report-row-left-more-vspace" th:text="${row.get('CALIBER')}">-</td>
-								<td class="table-report-row-right" style="padding-right: 55px" th:text="${row.get('TOTAL_ROUNDS_FIRED')}">-</td>
+								<td class="table-report-row-right" style="padding-right: 55px" th:text="${#numbers.formatDecimal(row.get('TOTAL_ROUNDS_FIRED'), 0, 'COMMA', 0, 'POINT')}">-</td>
 							</tr>
 							
 							<tr>
@@ -44,7 +44,7 @@
 							
 							<tr>
 								<td class="table-report-total-right">TOTAL</td>
-								<td class="table-report-total-right" style="padding-right: 55px" th:text="${reportTotal}">-</td>
+								<td class="table-report-total-right" style="padding-right: 55px" th:text="${#numbers.formatDecimal(reportTotal, 0, 'COMMA', 0, 'POINT')}">-</td>
 							</tr>
 							
 						</table>

@@ -71,7 +71,7 @@
 									</div>
 									<div th:unless="${row.get('NO_OF_ROUNDS') == '0'}">
 										<td class="table-report-row-left" th:text="${row.get('CALIBER')}">-</td>
-										<td class="table-report-row-center" th:text="${row.get('NO_OF_ROUNDS')}">-</td>
+										<td class="table-report-row-center" th:text="${#numbers.formatDecimal(row.get('NO_OF_ROUNDS'), 0, 'COMMA', 0, 'POINT')}">-</td>
 										<td class="table-report-row-center" th:text="${row.get('DATE_FIRED')}">-</td>
 									</div>
 									

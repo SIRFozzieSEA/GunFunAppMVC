@@ -9,9 +9,19 @@
 <meta http-equiv="Expires" content="0" />
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <link rel="stylesheet" type="text/css" href="/main.css" />
+<script src="/validation.js"></script>
 </head>
 <body>
-	<form name="f1" action="#" th:action="@{/log/carry_add}" method="post">
+	<script th:inline="javascript">
+	function genericValidator(o_form)
+	{
+    /*[# th:each="i : ${#numbers.sequence( 1, initialBlankEntries)}"]*/
+       if (!checkH2Date('DATE_CARRIED_[[${i}]]', 'Date Carried [[${i}]]')) return false;
+    /*[/]*/
+       return true;
+	}
+	</script>
+	<form name="f1" onsubmit="return genericValidator(this)" action="#" th:action="@{/log/carry_add}" method="post">
 
 		<table align="center" border="0">
 
@@ -42,7 +52,7 @@
 						    			<option th:each="gunName : ${allGunNamesSet}" th:value="${gunName}" th:text="${gunName}"></option>
 									</select>
 								</td>
-								<td class="table-report-row-center"><input th:name="${'DATE_CARRIED_' + i}" style="text-align: center; width: 80px" th:value="${weekDates[i]}" type="text" autocomplete="off" /></td>
+								<td class="table-report-row-center"><input th:id="${'DATE_CARRIED_' + i}" th:name="${'DATE_CARRIED_' + i}" style="text-align: center; width: 80px" th:value="${weekDates[i]}" type="text" autocomplete="off" /></td>
 								<td class="table-report-row-center" th:text="${dayDates[i]}"></td>
 							</tr>
 							
