@@ -11,7 +11,7 @@
 <script src="/validation.js"></script>
 </head>
 <body style="margin: 20px; background-color: #FFFF99">
-	<script>
+	<script th:inline="javascript">
 		function genericValidator(o_form)
 		{
 			if (!checkFieldLength('contestantName', 'Contestant Name', 2, 20, true)) return false;

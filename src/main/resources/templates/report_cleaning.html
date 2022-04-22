@@ -42,8 +42,14 @@
 								<td class="table-report-row-left-more-vspace" th:text="${row.get('CALIBER')}">-</td>
 								<td class="table-report-row-center-more-vspace" th:text="${row.get('LAST_DATE_FIRED')}">-</td>
 								<td class="table-report-row-center-more-vspace" th:text="${row.get('LAST_CLEANED_DATE')}">-</td>
-								<td class="table-report-row-right-more-vspace" style="padding-right: 65px" th:text="${row.get('TOTAL_ROUNDS_FIRED')}">-</td>
+								<td class="table-report-row-right-more-vspace" style="padding-right: 55px" th:text="${#numbers.formatDecimal(row.get('TOTAL_ROUNDS_FIRED'), 0, 'COMMA', 0, 'POINT')}">-</td>
 							</tr>
+							
+							<tr>
+								<td class="table-report-total-right" colspan="4">TOTAL</td>
+								<td class="table-report-total-right" style="padding-right: 55px" th:text="${#numbers.formatDecimal(reportTotal, 0, 'COMMA', 0, 'POINT')}">-</td>
+							</tr>
+							
 							
 						</table>
 					</div>

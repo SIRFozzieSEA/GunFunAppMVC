@@ -42,29 +42,31 @@
 						<tr>
 							<td class="stats-head" colspan="2">Costs</td>
 						</tr>
+						
+						
 						<tr>
 							<td class="stats-right">Total Paid</td>
-							<td class="stats-right" th:text="'$' + ${totalCost}"></td>
+							<td class="stats-right" th:text="'$' + ${#numbers.formatDecimal(totalCost, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="stats-right">Total Market</td>
-							<td class="stats-right" th:text="'$' + ${totalMarketCost}"></td>
+							<td class="stats-right" th:text="'$' + ${#numbers.formatDecimal(totalMarketCost, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="stats-right">Total Difference</td>
-							<td class="stats-right" th:text="'$' + ${totalDifferenceCost}"></td>
+							<td class="stats-right" th:text="'$' + ${#numbers.formatDecimal(totalDifferenceCost, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="stats-right">Max Paid</td>
-							<td class="stats-right" th:text="'$' + ${maxCost}"></td>
+							<td class="stats-right" th:text="'$' + ${#numbers.formatDecimal(maxCost, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="stats-right">Avg Paid</td>
-							<td class="stats-right" th:text="'$' + ${avgCost}"></td>
+							<td class="stats-right" th:text="'$' + ${#numbers.formatDecimal(avgCost, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="stats-right">Min Paid</td>
-							<td class="stats-right" th:text="'$' + ${minCost}"></td>
+							<td class="stats-right" th:text="'$' + ${#numbers.formatDecimal(minCost, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="main-table-fill-space-smaller" colspan="2">&nbsp;</td>
@@ -74,16 +76,16 @@
 						</tr>
 						<tr>
 							<td class="stats-right">Max</td>
-							<td class="stats-right" th:text="${maxBarrel}"></td>
+							<td class="stats-right" th:text="${#numbers.formatDecimal(maxBarrel, 0, 'COMMA', 2, 'POINT')}"></td>
 							
 						</tr>
 						<tr>
 							<td class="stats-right">Avg</td>
-							<td class="stats-right" th:text="${avgBarrel}"></td>
+							<td class="stats-right" th:text="${#numbers.formatDecimal(avgBarrel, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="stats-right">Min</td>
-							<td class="stats-right" th:text="${minBarrel}"></td>
+							<td class="stats-right" th:text="${#numbers.formatDecimal(minBarrel, 0, 'COMMA', 2, 'POINT')}"></td>
 						</tr>
 						<tr>
 							<td class="main-table-fill-space-smaller" colspan="2">&nbsp;</td>
