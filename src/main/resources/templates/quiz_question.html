@@ -7,103 +7,75 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-<style type="text/css">
-
-.auto-style8 {
-	text-align: center;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	font-size: large;
-	font-weight: bold;
-	padding-bottom: 6px;
-}
-
-a {
-	color: #000000;
-}
-a:visited {
-	color: #000000;
-}
-.auto-style9 {
-	text-align: left;
-}
-.auto-style10 {
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	font-size: small;
-}
-.auto-style11 {
-	text-align: left;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	font-size: small;
-	font-weight: bold;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="/main.css" />
+<script src="/validation.js"></script>
 </head>
-<body style="margin: 20px; background-color: #FFFF99">
-<form action="#" th:action="@{/quiz/question}" th:object="${gunTriviaRoundsQuestions}" method="post">
-	<table align="center" cellpadding="2" cellspacing="0">
-		<tr>
-			<td class="auto-style8" th:text="${reportTitle}">-</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		
-		<tr>
-			<td>
+<body>
+	<script th:inline="javascript">
+		function genericValidator(o_form)
+		{
+			return true;
+		}
+	</script>
+	<form action="#" onsubmit="return genericValidator(this)" th:action="@{/quiz/question}" th:object="${gunTriviaRoundsQuestions}" method="post">
 
-				<table align="center" border="0" cellpadding="4" cellspacing="4">
-					<tr>
-						<td class="auto-style11" valign="top" style="width: 250px" th:text="*{question}"></td>
-						<td class="auto-style9" rowspan="3" valign="top" style="width: 355px">
-							<div th:if="*{imageLocation == 'REGISTRY'}">
-								<a th:href="'/getImageForQuestion?questionPk=' + *{questionPk} + '&size=large'" target="_blank">
-												<img th:src="'/getImageForQuestion?questionPk=' + *{questionPk} + '&size=small'" align="top" class="auto-style2"  /></a>
-							</div>
-							<div th:unless="*{imageLocation == 'REGISTRY'}">
-								
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<td class="auto-style9" valign="top" style="width: 250px">
-						
-							<select th:field="*{userResponse}" style="width: 180px" class="auto-style10" >
-								<option value="">---</option>
-				    			<option th:each="answers : ${dropDownAnswers}" th:value="${answers}" th:text="${answers}"></option>
-							</select><span class="auto-style10"> </span>
-						
-						</td>
-					</tr>
-					<tr>
-						<td class="auto-style9" valign="top" style="width: 250px">
-						<input name="Submit1" type="submit" value="Submit" class="auto-style10" /></td>
-					</tr>
-				</table>
+		<table align="center" border="0">
 
-			</td>
-		</tr>
-
-	</table>
-	
-	<input name="getAllGunNames" th:value="${getAllGunNames}" type="hidden" />
-	<input name="getAllMakes" th:value="${getAllMakes}" type="hidden" />
-	<input name="getAllModels" th:value="${getAllModels}" type="hidden" />
-	<input name="getAllCalibers" th:value="${getAllCalibers}" type="hidden" />
-	
-	<input th:field="*{roundPk}" type="hidden" />
-	<input th:field="*{questionPk}" type="hidden" />
-	
-</form>
-
-
-
+			<tr>
+				<td class="main-table-bold-header"><span class="message-text" th:text="${reportTitle}" /></td>
+			</tr>
+			
+			<tr>
+				<td class="main-table-fill-space">&nbsp;</td>
+			</tr>
+			
+			<tr>
+				<td class="main-table-fill-space">
 				
+				
+				
+					<table align="center" border="0" cellpadding="4" cellspacing="4" style="width: 700px">
+						<tr>
+							<td class="quiz-question" valign="top" th:text="*{question}"></td>
+							<td rowspan="2">
+								<div th:if="*{imageLocation == 'REGISTRY'}"><a th:href="'/getImageForQuestion?questionPk=' + *{questionPk} + '&size=large'" target="_blank">
+								<img th:src="'/getImageForQuestion?questionPk=' + *{questionPk} + '&size=small'" align="top" /></a>
+								</div>
+								<div th:unless="*{imageLocation == 'REGISTRY'}"></div>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<select th:field="*{userResponse}" style="width: 180px" >
+									<option value="">---</option>
+					    			<option th:each="answers : ${dropDownAnswers}" th:value="${answers}" th:text="${answers}"></option>
+								</select>
+							</td>
+						</tr>
+					</table>
 
-
+				</td>
+			</tr>
 		
+			<tr>
+				<td class="main-table-fill-space">&nbsp;</td>
+			</tr>
+			
+			<tr>
+				<td class="main-table-fill-space"><input name="Submit1" type="submit" value="Submit" /></td>
+			</tr>
+			
 
+		</table>
 
+		<input name="getAllGunNames" th:value="${getAllGunNames}" type="hidden" />
+		<input name="getAllMakes" th:value="${getAllMakes}" type="hidden" />
+		<input name="getAllModels" th:value="${getAllModels}" type="hidden" />
+		<input name="getAllCalibers" th:value="${getAllCalibers}" type="hidden" />
+		
+		<input th:field="*{roundPk}" type="hidden" />
+		<input th:field="*{questionPk}" type="hidden" />
 
+	</form>
 </body>
-
 </html>

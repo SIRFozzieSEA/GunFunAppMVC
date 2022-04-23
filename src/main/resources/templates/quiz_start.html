@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="/main.css" />
 <script src="/validation.js"></script>
 </head>
-<body style="margin: 20px; background-color: #FFFF99">
+<body>
 	<script th:inline="javascript">
 		function genericValidator(o_form)
 		{
@@ -22,54 +22,44 @@
 			return true;
 		}
 	</script>
-<form action="#" onsubmit="return genericValidator(this)" th:action="@{/quiz/question}" method="post">
-	<table align="center" cellpadding="2" cellspacing="0">
-		<tr>
-			<td colspan="2" class="auto-style8" th:text="${reportTitle}">-</td>
-		</tr>
+	<form action="#" onsubmit="return genericValidator(this)" th:action="@{/quiz/question}" method="post">
+
+		<table align="center" border="0">
+
+			<tr>
+				<td class="main-table-bold-header" colspan="2"><span class="message-text" th:text="${reportTitle}" /></td>
+			</tr>
+			
+			<tr>
+				<td class="main-table-fill-space" colspan="2">&nbsp;</td>
+			</tr>
+			
+			<tr>
+				<td class="table-report-row-right">Contestant Name:</td>
+				<td class="table-report-row-left"><input id="contestantName" name="contestantName" style="width: 168px" type="text" autocomplete="off" /></td>
+			</tr>
+			
+			<tr>
+				<td class="table-report-row-right">No. of Questions:</td>
+				<td class="table-report-row-left"><input id="noOfQuestions" name="noOfQuestions" style="width: 40px" type="text" autocomplete="off" /></td>
+			</tr>
 		
-		<tr>
-			<td colspan="2">&nbsp;</td>
-		</tr>
-		
-		
-		<tr>
-			<td class="auto-style11">Contestant Name:</td>
-			<td><input id="contestantName" name="contestantName" style="width: 168px" type="text" autocomplete="off" /></td>
-		</tr>
-		
-		<tr>
-			<td class="auto-style11">No. of Questions:</td>
-			<td><input id="noOfQuestions" name="noOfQuestions" style="width: 40px" type="text" autocomplete="off" /></td>
-		</tr>
-		
-		<tr>
-			<td>&nbsp;</td>
-			<td><input name="Submit1" type="submit" value="Submit" /></td>
-		</tr>
-		
+			<tr>
+				<td class="main-table-fill-space" colspan="2">&nbsp;</td>
+			</tr>
+			
+			<tr>
+				<td class="main-table-fill-space" colspan="2"><input name="Submit1" type="submit" value="Submit" /></td>
+			</tr>
+			
 
+		</table>
 
-	</table>
-	
-	
-	<input name="getAllGunNames" th:value="${getAllGunNames}" type="hidden" />
-	<input name="getAllMakes" th:value="${getAllMakes}" type="hidden" />
-	<input name="getAllModels" th:value="${getAllModels}" type="hidden" />
-	<input name="getAllCalibers" th:value="${getAllCalibers}" type="hidden" />
+		<input name="getAllGunNames" th:value="${getAllGunNames}" type="hidden" />
+		<input name="getAllMakes" th:value="${getAllMakes}" type="hidden" />
+		<input name="getAllModels" th:value="${getAllModels}" type="hidden" />
+		<input name="getAllCalibers" th:value="${getAllCalibers}" type="hidden" />
 
-	
-</form>
-
-
-
-				
-
-
-		
-
-
-
+	</form>
 </body>
-
 </html>

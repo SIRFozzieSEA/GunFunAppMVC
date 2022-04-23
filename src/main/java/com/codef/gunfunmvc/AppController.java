@@ -99,8 +99,6 @@ public class AppController {
 	 * Main App Windows
 	 */
 	
-	// TODO: Finish auto-style edits, validation
-
 	// jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
 	// jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
 
