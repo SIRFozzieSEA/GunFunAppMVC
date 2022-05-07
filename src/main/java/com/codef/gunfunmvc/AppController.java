@@ -101,7 +101,7 @@ public class AppController {
 	
 	// jdbc:h2:file:/E:\Documents\Personal\Gun Stuff\GunFunMVC\_data\gunfunmvc
 	// jdbc:h2:file:/C:\GunFunMVCTest\_data\gunfunmvc
-
+	
 	@GetMapping("/")
 	public String indexLaunch(Model model) throws SQLException, IOException {
 

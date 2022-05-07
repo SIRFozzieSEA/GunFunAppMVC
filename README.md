@@ -37,6 +37,7 @@ To get the project running for the first time (build tables, app folders, sample
 ### Other Notes
 
 - **Backups** -- The backup feature allows you to backup when the application is running.  Data will be exported as SQL dump, tab delimited files, images will be backed up in a .zip file, manuals will be backed up in a .zip file as well.  Backing up the properties file will result in a single file.  All backups are prefixed by the date, and will be written into the `[GUNFUN_APP_FOLDER]\_backup` folder.  Also included in the `[GUNFUN_APP_FOLDER]\_data` folder is a .bat script that will copy the raw H2 data file... the database should **not be running** when this script is executed to make sure all data is copied.
+- **Carry Logs** -- In interest to keeping the carry logs up to date, you can create a desktop shortcut with `http://localhost:9002/log/carry_add?SHUTDOWN_AFTER=true` which will launch the carry log screen, update your entries and shut down the computer.
 
 
 ### 'To Do' List
