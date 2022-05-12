@@ -44,4 +44,3 @@ To get the project running for the first time (build tables, app folders, sample
 - A way to customize template questions
 - Manage preference page
 - Make delete file/folder consistent in utils
-- Fix styling on pages with `auto-` on them
