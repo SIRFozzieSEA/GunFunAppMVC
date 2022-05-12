@@ -363,6 +363,58 @@ a:hover {
 	letter-spacing: -.05em;
 }
 
+.final-score {
+	text-align: center;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: medium;
+}
+
+.quiz-question-left {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	font-weight: bold;
+}
+
+.correct-response {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: large;
+	font-weight: bold;
+	color: #009933;
+}
+
+.incorrect-response {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: large;
+	font-weight: bold;
+	color: #ff0000;
+}
+
+.correct-response-two {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	font-weight: bold;
+	color: #009933;
+}
+
+.incorrect-response-two {
+	text-align: left;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: small;
+	font-weight: bold;
+	color: #ff0000;
+}
+
+.quiz-question {
+	font-size: 10pt;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: bottom;
+}
+
 
 
 
